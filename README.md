@@ -1,4 +1,4 @@
-# Kerchanshe Paayroll System
+# Kerchanshe Payroll System
 
 ## Start a project
 

@@ -6,6 +6,8 @@ import "./App.css";
 import Signin from "./pages/Auth/SignIn/Signin";
 import Signup from "./pages/Auth/Signup/Signup";
 import Logout from "./pages/Auth/Logout";
+import Employee from "./pages/Employee/Employee";
+import Account from "./pages/Account/Account";
 
 function App() {
   return (
@@ -13,7 +15,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />}>
           <Route path="home" element={<Home />} />
+          <Route path="employee" element={<Employee />} />
           <Route path="payroll" element={<Payroll />} />
+          <Route path="account" element={<Account />} />
         </Route>
 
         <Route path="signin" element={<Signin />} />

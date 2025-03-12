@@ -1,5 +1,10 @@
 import React, { useState } from "react";
 import {
+  AuditOutlined,
+  BarChartOutlined,
+  DashboardOutlined,
+  KeyOutlined,
+  LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UploadOutlined,
@@ -22,11 +27,7 @@ const Dashboard = () => {
 
   return (
     <Layout className="min-h-screen flex">
-      <Sider
-        trigger={null}
-        collapsible
-        collapsed={collapsed}
-      >
+      <Sider trigger={null} collapsible collapsed={collapsed}>
         <div className="demo-logo-vertical" />
         <h2 className="text-2xl font-bold text-white flex items-center justify-between p-5">
           {/* <img src={Logo} width={30} height={30} alt="Logo" className="mr-2" /> */}
@@ -36,11 +37,12 @@ const Dashboard = () => {
         <Menu
           theme="dark"
           mode="inline"
+          className="mt-10"
           defaultSelectedKeys={["1"]}
           items={[
             {
               key: "1",
-              icon: <UserOutlined />,
+              icon: <DashboardOutlined />,
               label: "Dashboard",
               onClick: () => {
                 navigate("/home");
@@ -48,16 +50,47 @@ const Dashboard = () => {
             },
             {
               key: "2",
+              icon: <DashboardOutlined />,
+              label: "Employee Management",
+              onClick: () => {
+                navigate("/employee");
+              },
+            },
+            {
+              key: "3",
               icon: <VideoCameraOutlined />,
-              label: "Payroll",
+              label: "Payroll Calculation",
               onClick: () => {
                 navigate("/payroll");
               },
             },
             {
-              key: "3",
-              icon: <UploadOutlined />,
-              label: "Other",
+              key: "4",
+              icon: <UserOutlined />,
+              label: "Loan Management",
+            },
+            {
+              key: "5",
+              icon: <AuditOutlined />,
+              label: "Taxation & Pension",
+            },
+            {
+              key: "6",
+              icon: <BarChartOutlined />,
+              label: "Report",
+            },
+            {
+              key: "7",
+              icon: <KeyOutlined />,
+              label: "Account",
+              onClick: () => {
+                navigate("/account");
+              },
+            },
+            {
+              key: "8",
+              icon: <LogoutOutlined />,
+              label: "Logout",
             },
           ]}
         />
@@ -85,7 +118,7 @@ const Dashboard = () => {
             margin: "24px 16px",
             padding: 24,
             minHeight: 280,
-            background: colorBgContainer,
+            // background: colorBgContainer,
             borderRadius: borderRadiusLG,
           }}
         >
