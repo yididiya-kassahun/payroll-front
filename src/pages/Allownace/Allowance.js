@@ -8,6 +8,8 @@ import {
 } from "@ant-design/icons";
 import EditAllowance from "./EditAllowance";
 import AddAllowance from "./AddAllowance";
+import { fetchAllowance } from "../../services/employeeService";
+import { useQuery } from "@tanstack/react-query";
 
 const { Column } = Table;
 
@@ -16,9 +18,18 @@ function Allowance() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
+  const [selectedRecord, setSelectedRecord] = useState(null);
 
-  const showDrawer = () => {
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["allowance"],
+    queryFn: () => fetchAllowance(),
+    keepPreviousData: true,
+    staleTime: 5000,
+  });
+
+  const showDrawer = (record) => {
     setOpen(true);
+    setSelectedRecord(record);
   };
 
   const showModal = () => {
@@ -43,42 +54,18 @@ function Allowance() {
     setRecordToDelete(null);
   };
 
-  const data = [
-    {
-      key: "1",
-      tinNumber: "31231",
-      name: "John Brown",
-      Non_Taxable_Allowance: "3200",
-      Taxable_Allowance: "10",
-      Overtime_Hours: "54",
-      Sales_Commission_Allowance: "1200",
-      Night_Working_Hours: "32",
-      Sunday_Working_Hours: "12",
-      Holiday_Working_Hours: "2",
-    },
-    {
-      key: "2",
-      tinNumber: "31231",
-      name: "John Brown",
-      Non_Taxable_Allowance: "3200",
-      Taxable_Allowance: "10",
-      Overtime_Hours: "54",
-      Sales_Commission_Allowance: "1200",
-      Night_Working_Hours: "32",
-      Sunday_Working_Hours: "12",
-    },
-    {
-      key: "3",
-      tinNumber: "31231",
-      name: "John Brown",
-      Non_Taxable_Allowance: "3200",
-      Taxable_Allowance: "10",
-      Overtime_Hours: "54",
-      Sales_Commission_Allowance: "1200",
-      Night_Working_Hours: "32",
-      Sunday_Working_Hours: "12",
-    },
-  ];
+  const dataSource = data?.allowances?.map((allowance) => ({
+    key: allowance.id,
+    tinNumber: allowance.employee_tin,
+    name: "N/A",
+    Non_Taxable_Allowance: allowance.non_taxable_allowance,
+    Taxable_Allowance: allowance.taxable_allowance,
+    Overtime_Hours: allowance.overtime_hours,
+    Sales_Commission_Allowance: allowance.sales_commission_allowance,
+    Night_Working_Hours: allowance.night_working_hours,
+    Sunday_Working_Hours: allowance.sunday_working_hours,
+    Holiday_Working_Hours: allowance.holiday_working_hours,
+  }));
 
   return (
     <>
@@ -94,7 +81,7 @@ function Allowance() {
         </Button>
       </div>
       <div className="bg-white shadow-md mt-10">
-        <Table dataSource={data}>
+        <Table dataSource={dataSource}>
           <Column
             title="Full Name"
             dataIndex="name"
@@ -140,7 +127,7 @@ function Allowance() {
               <div className="flex flex-col md:flex-row gap-2">
                 <Button
                   type="primary"
-                  onClick={showDrawer}
+                  onClick={() => showDrawer(record)}
                   className="w-full md:w-auto bg-purple-500 text-white"
                 >
                   <CheckCircleOutlined />
@@ -159,7 +146,11 @@ function Allowance() {
           />
         </Table>
       </div>
-      <EditAllowance open={open} onClose={() => setOpen(false)} />
+      <EditAllowance
+        open={open}
+        onClose={() => setOpen(false)}
+        allowanceData={selectedRecord}
+      />
       <AddAllowance
         isModalOpen={isModalOpen}
         handleOk={handleOk}

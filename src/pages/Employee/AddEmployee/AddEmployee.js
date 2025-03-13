@@ -3,21 +3,34 @@ import {
   Form,
   Input,
   InputNumber,
-  DatePicker,
   Button,
   Row,
   Col,
+  message,
 } from "antd";
-import { useState } from "react";
+import { addEmployee } from "../../../services/employeeService";
+import { useMutation } from "@tanstack/react-query";
 
 const AddEmployee = ({ isModalOpen, handleOk, handleCancel }) => {
   const [form] = Form.useForm();
-  const [loanAmount, setLoanAmount] = useState(0);
+
+  const { mutate } = useMutation({
+    mutationFn: addEmployee,
+    onSuccess: (data) => {
+      message.success("Employee record added!");
+      form.resetFields();
+      handleOk();
+    },
+    onError: (error) => {
+      message.error("Employee already exist");
+      console.log("Mutation error:", error.message);
+      handleCancel();
+    },
+  });
 
   const handleFinish = (values) => {
     console.log("Form values:", values);
-    //onSubmit(values);
-    form.resetFields();
+    mutate(values);
   };
 
   return (
@@ -97,33 +110,6 @@ const AddEmployee = ({ isModalOpen, handleOk, handleCancel }) => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="Loan_Amount" label="Loan Amount" initialValue={0}>
-              <InputNumber
-                className="w-full"
-                min={0}
-                placeholder="Enter Loan Amount"
-                onChange={(value) => setLoanAmount(value)}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="Loan_Deduction_Per_Month"
-              label="Loan Deduction Per Month"
-              initialValue={0}
-            >
-              <InputNumber
-                className="w-full"
-                min={0}
-                disabled={loanAmount === 0}
-                placeholder="Enter Monthly Deduction"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
             <Form.Item
               name="Number_of_Working_Days"
               label="Number of Working Days"
@@ -134,19 +120,6 @@ const AddEmployee = ({ isModalOpen, handleOk, handleCancel }) => {
                 min={1}
                 placeholder="Enter Working Days"
               />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item name="Deduction_Start_Date" label="Deduction Start Date">
-              <DatePicker className="w-full" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item name="Deduction_End_Date" label="Deduction End Date">
-              <DatePicker className="w-full" />
             </Form.Item>
           </Col>
         </Row>

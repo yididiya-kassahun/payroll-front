@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Col,
-  DatePicker,
   Drawer,
   Form,
   Input,
@@ -10,9 +9,31 @@ import {
   Row,
 } from "antd";
 
-const EditEmployee = ({ open, onClose }) => {
+const EditEmployee = ({ open, onClose, record }) => {
   const [form] = Form.useForm();
-  const [loanAmount, setLoanAmount] = useState(0);
+
+  useEffect(() => {
+    if (record) {
+      form.setFieldsValue({
+        Employee_TIN: record.tinNumber,
+        Employee_Name: record.name,
+        Basic_Salary: record.salary,
+        Food_Deduction: record.Food_Deduction,
+        Penalty: record.Penalty,
+        Number_of_Working_Days: record.Number_of_Working_Days,
+        Bank_Account: record.bankAccount,
+      });
+    }
+  }, [form, record]);
+
+  const onFinish = (values) => {
+    console.log("Success:", values);
+    onClose(); 
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
 
   return (
     <>
@@ -22,7 +43,13 @@ const EditEmployee = ({ open, onClose }) => {
         onClose={onClose}
         open={open}
       >
-        <Form form={form} layout="vertical" className="space-y-4">
+        <Form
+          form={form}
+          layout="vertical"
+          className="space-y-4"
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+        >
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -56,6 +83,7 @@ const EditEmployee = ({ open, onClose }) => {
                 <InputNumber
                   className="w-full"
                   placeholder="Enter Basic Salary"
+                  min={0}
                 />
               </Form.Item>
             </Col>
@@ -86,53 +114,6 @@ const EditEmployee = ({ open, onClose }) => {
             </Col>
             <Col span={12}>
               <Form.Item
-                name="Loan_Amount"
-                label="Loan Amount"
-                initialValue={0}
-              >
-                <InputNumber
-                  className="w-full"
-                  min={0}
-                  placeholder="Enter Loan Amount"
-                  onChange={(value) => setLoanAmount(value)}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="Loan_Deduction_Per_Month"
-                label="Loan Deduction Per Month"
-                initialValue={0}
-              >
-                <InputNumber
-                  className="w-full"
-                  min={0}
-                  disabled={loanAmount === 0}
-                  placeholder="Enter Monthly Deduction"
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="Deduction_Start_Date"
-                label="Deduction Start Date"
-              >
-                <DatePicker className="w-full" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="Deduction_End_Date" label="Deduction End Date">
-                <DatePicker className="w-full" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
                 name="Number_of_Working_Days"
                 label="Number of Working Days"
                 initialValue={30}
@@ -151,13 +132,10 @@ const EditEmployee = ({ open, onClose }) => {
           </Form.Item>
 
           <div className="flex justify-end gap-2 mt-10">
-            <Button className="py-6 px-8">Cancel</Button>
-            <Button
-              color="default"
-              variant="solid"
-              className="py-6 px-8"
-              htmlType="submit"
-            >
+            <Button onClick={onClose} className="py-6 px-8">
+              Cancel
+            </Button>
+            <Button type="primary" className="py-6 px-8" htmlType="submit">
               Update
             </Button>
           </div>

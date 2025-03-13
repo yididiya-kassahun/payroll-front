@@ -5,7 +5,7 @@ import {
   SwapRightOutlined,
   MessageOutlined,
 } from "@ant-design/icons";
-import { Line, PolarArea } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -23,6 +23,9 @@ import card2 from "../../assets/cards/card2.svg";
 import card3 from "../../assets/cards/card3.svg";
 import card4 from "../../assets/cards/card4.svg";
 
+import PolarChart from "../../components/chart/PolarChart";
+import LineChart from "../../components/chart/LineChart";
+
 // Register Chart.js components
 ChartJS.register(
   CategoryScale,
@@ -36,6 +39,7 @@ ChartJS.register(
 );
 
 function Dashboard() {
+  
   const reportData = [
     {
       label: "Total Employee",
@@ -67,36 +71,7 @@ function Dashboard() {
     },
   ];
 
-  // Sample Line Chart Data
-  const lineChartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [
-      {
-        label: "User Growth",
-        data: [200, 500, 1500, 3200, 4500, 6000],
-        borderColor: "rgb(54, 162, 235)",
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-        tension: 0.4,
-      },
-    ],
-  };
-
-  // Sample Polar Area Chart Data
-  const polarChartData = {
-    labels: ["Marketing", "Development", "Sales", "Support", "HR"],
-    datasets: [
-      {
-        data: [30, 50, 20, 40, 35],
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.6)",
-          "rgba(54, 162, 235, 0.6)",
-          "rgba(255, 206, 86, 0.6)",
-          "rgba(75, 192, 192, 0.6)",
-          "rgba(153, 102, 255, 0.6)",
-        ],
-      },
-    ],
-  };
+  
 
   return (
     <div className="flex flex-col items-center bg-gray-100 p-6">
@@ -125,17 +100,8 @@ function Dashboard() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10 max-w-7xl w-full">
-        <div className="bg-white p-6 rounded-xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-4">User Growth Over Time</h2>
-          <Line data={lineChartData} />
-        </div>
-
-        <div className="bg-white p-14 rounded-xl shadow-lg">
-          <h2 className="text-lg font-semibold mb-4">
-            Department Distribution
-          </h2>
-          <PolarArea data={polarChartData}/>
-        </div>
+        <LineChart />
+        <PolarChart />
       </div>
     </div>
   );

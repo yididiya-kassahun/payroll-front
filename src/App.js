@@ -1,4 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./services/http";
+
 import Payroll from "./pages/Employee/Payroll/Payroll";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Home from "./pages/Home/Home";
@@ -15,22 +18,24 @@ import Logout from "./pages/Auth/Logout";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Dashboard />}>
-          <Route path="home" element={<Home />} />
-          <Route path="employee" element={<Employee />} />
-          <Route path="payroll/:id" element={<Payroll />} />
-          <Route path="account" element={<Account />} />
-          <Route path="allowance" element={<Allowance />} />
-          <Route path="setting" element={<Setting />} />
-        </Route>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Dashboard />}>
+            <Route path="home" element={<Home />} />
+            <Route path="employee" element={<Employee />} />
+            <Route path="payroll/:id" element={<Payroll />} />
+            <Route path="account" element={<Account />} />
+            <Route path="allowance" element={<Allowance />} />
+            <Route path="setting" element={<Setting />} />
+          </Route>
 
-        <Route path="signin" element={<Signin />} />
-        <Route path="signup" element={<Signup />} />
-        <Route path="logout" element={<Logout />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="signin" element={<Signin />} />
+          <Route path="signup" element={<Signup />} />
+          <Route path="logout" element={<Logout />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 

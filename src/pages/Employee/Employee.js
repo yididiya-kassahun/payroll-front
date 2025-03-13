@@ -9,6 +9,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import EditEmployee from "./EditEmployee/EditEmployee";
 import AddEmployee from "./AddEmployee/AddEmployee";
+import { useQuery } from "@tanstack/react-query";
+
+import { fetchEmployees } from "../../services/employeeService";
 
 const { Column } = Table;
 
@@ -17,11 +20,20 @@ function Employee() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
+  const [selectedRecord, setSelectedRecord] = useState(null);
 
   const navigate = useNavigate();
 
-  const showDrawer = () => {
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["employees"],
+    queryFn: () => fetchEmployees(),
+    keepPreviousData: true,
+    staleTime: 5000,
+  });
+
+  const showDrawer = (record) => {
     setOpen(true);
+    setSelectedRecord(record);
   };
 
   const showModal = () => {
@@ -46,35 +58,15 @@ function Employee() {
     setRecordToDelete(null);
   };
 
-  const data = [
-    {
-      key: "1",
-      tinNumber: "31231",
-      name: "John Brown",
-      salary: 3200,
-      bankAccount: "New York No. 1 Lake Park",
-      deductionStartDate: "12/04/2025",
-      deductionEndDate: "23/05/2025",
-    },
-    {
-      key: "2",
-      tinNumber: "6343",
-      name: "John Brown",
-      salary: 3200,
-      bankAccount: "New York No. 1 Lake Park",
-      deductionStartDate: "12/04/2025",
-      deductionEndDate: "23/05/2025",
-    },
-    {
-      key: "3",
-      tinNumber: "4235",
-      name: "John Brown",
-      salary: 3200,
-      bankAccount: "100012312312",
-      deductionStartDate: "12/04/2025",
-      deductionEndDate: "23/05/2025",
-    },
-  ];
+  const dataSource = data?.employees?.map((employee) => ({
+    key: employee.id,
+    tinNumber: employee.Employee_TIN,
+    name: employee.Employee_Name,
+    salary: employee.Basic_Salary,
+    bankAccount: employee.Bank_Account,
+    Penality: employee.Penalty,
+    Number_of_Working_Days: employee.Number_of_Working_Days,
+  }));
 
   return (
     <>
@@ -90,9 +82,9 @@ function Employee() {
         </Button>
       </div>
       <div className="bg-white shadow-md mt-10">
-        <Table dataSource={data}>
+        <Table dataSource={dataSource}>
           <Column
-            title="Full Name"
+            title="Employee Name"
             dataIndex="name"
             key="name"
             render={(name) => <a>{name}</a>}
@@ -101,15 +93,11 @@ function Employee() {
 
           <Column title="Salary" dataIndex="salary" key="salary" />
           <Column title="Bank Acc." dataIndex="bankAccount" key="bankAccount" />
+          <Column title="Penality" dataIndex="Penality" key="Penality" />
           <Column
-            title="Deduction Start Date"
-            dataIndex="deductionStartDate"
-            key="deductionStartDate"
-          />
-          <Column
-            title="Deduction End Date"
-            dataIndex="deductionEndDate"
-            key="deductionEndDate"
+            title="Number of Working Days"
+            dataIndex="Number_of_Working_Days"
+            key="Number_of_Working_Days"
           />
           <Column
             title="Action"
@@ -126,7 +114,7 @@ function Employee() {
                 </Button>
                 <Button
                   type="primary"
-                  onClick={showDrawer}
+                  onClick={() => showDrawer(record)}
                   className="w-full md:w-auto bg-purple-500 text-white"
                 >
                   <CheckCircleOutlined />
@@ -153,7 +141,14 @@ function Employee() {
           />
         </Table>
       </div>
-      <EditEmployee open={open} onClose={() => setOpen(false)} />
+      {selectedRecord && (
+        <EditEmployee
+          open={open}
+          onClose={() => setOpen(false)}
+          record={selectedRecord}
+        />
+      )}
+      ;
       <AddEmployee
         isModalOpen={isModalOpen}
         handleOk={handleOk}
