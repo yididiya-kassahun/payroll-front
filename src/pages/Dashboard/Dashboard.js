@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {
   AuditOutlined,
-  BarChartOutlined,
   DashboardOutlined,
+  FormOutlined,
   KeyOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined,
+  SettingOutlined,
   UserOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
@@ -58,29 +58,22 @@ const Dashboard = () => {
             },
             {
               key: "3",
-              icon: <VideoCameraOutlined />,
-              label: "Payroll Calculation",
+              icon: <FormOutlined />,
+              label: "Employee Allowance",
               onClick: () => {
-                navigate("/payroll");
+                navigate("/allowance");
               },
             },
             {
               key: "4",
-              icon: <UserOutlined />,
-              label: "Loan Management",
+              icon: <SettingOutlined />,
+              label: "Setting",
+              onClick: () => {
+                navigate("/setting");
+              },
             },
             {
               key: "5",
-              icon: <AuditOutlined />,
-              label: "Taxation & Pension",
-            },
-            {
-              key: "6",
-              icon: <BarChartOutlined />,
-              label: "Report",
-            },
-            {
-              key: "7",
               icon: <KeyOutlined />,
               label: "Account",
               onClick: () => {
@@ -88,7 +81,7 @@ const Dashboard = () => {
               },
             },
             {
-              key: "8",
+              key: "6",
               icon: <LogoutOutlined />,
               label: "Logout",
             },

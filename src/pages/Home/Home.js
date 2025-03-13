@@ -5,18 +5,42 @@ import {
   SwapRightOutlined,
   MessageOutlined,
 } from "@ant-design/icons";
+import { Line, PolarArea } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  RadialLinearScale,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
 import card1 from "../../assets/cards/card1.svg";
 import card2 from "../../assets/cards/card2.svg";
 import card3 from "../../assets/cards/card3.svg";
 import card4 from "../../assets/cards/card4.svg";
 
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  RadialLinearScale,
+  ArcElement,
+  Tooltip,
+  Legend
+);
+
 function Dashboard() {
   const reportData = [
     {
-      label: "USERS SIGNED UP",
+      label: "Total Employee",
       value: "3882",
       icon: <UsergroupAddOutlined className="text-3xl text-blue-500" />,
-      // bgColor: "bg-blue-100",
       textColor: "text-blue-600",
       bgImage: card1,
     },
@@ -24,7 +48,6 @@ function Dashboard() {
       label: "LIFETIME VALUE",
       value: "532",
       icon: <BookOutlined className="text-3xl text-yellow-500" />,
-      // bgColor: "bg-yellow-100",
       textColor: "text-yellow-600",
       bgImage: card2,
     },
@@ -32,7 +55,6 @@ function Dashboard() {
       label: "CONVERSION RATE",
       value: "12.6%",
       icon: <SwapRightOutlined className="text-3xl text-green-500" />,
-      // bgColor: "bg-green-100",
       textColor: "text-green-600",
       bgImage: card3,
     },
@@ -40,19 +62,50 @@ function Dashboard() {
       label: "ACTIVE TRIALS",
       value: "440",
       icon: <MessageOutlined className="text-3xl text-purple-500" />,
-      // bgColor: "bg-purple-100",
       textColor: "text-purple-600",
       bgImage: card4,
     },
   ];
 
+  // Sample Line Chart Data
+  const lineChartData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    datasets: [
+      {
+        label: "User Growth",
+        data: [200, 500, 1500, 3200, 4500, 6000],
+        borderColor: "rgb(54, 162, 235)",
+        backgroundColor: "rgba(54, 162, 235, 0.2)",
+        tension: 0.4,
+      },
+    ],
+  };
+
+  // Sample Polar Area Chart Data
+  const polarChartData = {
+    labels: ["Marketing", "Development", "Sales", "Support", "HR"],
+    datasets: [
+      {
+        data: [30, 50, 20, 40, 35],
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.6)",
+          "rgba(54, 162, 235, 0.6)",
+          "rgba(255, 206, 86, 0.6)",
+          "rgba(75, 192, 192, 0.6)",
+          "rgba(153, 102, 255, 0.6)",
+        ],
+      },
+    ],
+  };
+
   return (
-    <div className="flex items-center justify-center bg-gray-100 p-2">
+    <div className="flex flex-col items-center bg-gray-100 p-6">
+      {/* Cards Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl w-full">
         {reportData.map((item, index) => (
           <div
             key={index}
-            className={`bg-white p-6 rounded-xl shadow-lg flex flex-col`}
+            className="bg-white p-6 rounded-xl shadow-lg flex flex-col"
             style={{
               backgroundImage: `url(${item.bgImage})`,
               backgroundRepeat: "no-repeat",
@@ -68,6 +121,21 @@ function Dashboard() {
             <p className="text-2xl font-bold mb-4">{item.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10 max-w-7xl w-full">
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+          <h2 className="text-lg font-semibold mb-4">User Growth Over Time</h2>
+          <Line data={lineChartData} />
+        </div>
+
+        <div className="bg-white p-14 rounded-xl shadow-lg">
+          <h2 className="text-lg font-semibold mb-4">
+            Department Distribution
+          </h2>
+          <PolarArea data={polarChartData}/>
+        </div>
       </div>
     </div>
   );

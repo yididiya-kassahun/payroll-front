@@ -6,19 +6,16 @@ import {
   EyeOutlined,
   HolderOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import EditEmployee from "./EditEmployee/EditEmployee";
-import AddEmployee from "./AddEmployee/AddEmployee";
+import EditAllowance from "./EditAllowance";
+import AddAllowance from "./AddAllowance";
 
 const { Column } = Table;
 
-function Employee() {
+function Allowance() {
   const [open, setOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
-
-  const navigate = useNavigate();
 
   const showDrawer = () => {
     setOpen(true);
@@ -51,34 +48,41 @@ function Employee() {
       key: "1",
       tinNumber: "31231",
       name: "John Brown",
-      salary: 3200,
-      bankAccount: "New York No. 1 Lake Park",
-      deductionStartDate: "12/04/2025",
-      deductionEndDate: "23/05/2025",
+      Non_Taxable_Allowance: "3200",
+      Taxable_Allowance: "10",
+      Overtime_Hours: "54",
+      Sales_Commission_Allowance: "1200",
+      Night_Working_Hours: "32",
+      Sunday_Working_Hours: "12",
+      Holiday_Working_Hours: "2",
     },
     {
       key: "2",
-      tinNumber: "6343",
+      tinNumber: "31231",
       name: "John Brown",
-      salary: 3200,
-      bankAccount: "New York No. 1 Lake Park",
-      deductionStartDate: "12/04/2025",
-      deductionEndDate: "23/05/2025",
+      Non_Taxable_Allowance: "3200",
+      Taxable_Allowance: "10",
+      Overtime_Hours: "54",
+      Sales_Commission_Allowance: "1200",
+      Night_Working_Hours: "32",
+      Sunday_Working_Hours: "12",
     },
     {
       key: "3",
-      tinNumber: "4235",
+      tinNumber: "31231",
       name: "John Brown",
-      salary: 3200,
-      bankAccount: "100012312312",
-      deductionStartDate: "12/04/2025",
-      deductionEndDate: "23/05/2025",
+      Non_Taxable_Allowance: "3200",
+      Taxable_Allowance: "10",
+      Overtime_Hours: "54",
+      Sales_Commission_Allowance: "1200",
+      Night_Working_Hours: "32",
+      Sunday_Working_Hours: "12",
     },
   ];
 
   return (
     <>
-      <h2 className="text-xl text-semibold mb-4">Employee Management</h2>
+      <h2 className="text-xl text-semibold mb-4">Employee Allowance</h2>
       <hr />
       <div className="flex justify-end mt-5">
         <Button
@@ -86,7 +90,7 @@ function Employee() {
           style={{ backgroundColor: "#001529" }}
           onClick={showModal}
         >
-          + Add Employee
+          + Add Employee Allowance
         </Button>
       </div>
       <div className="bg-white shadow-md mt-10">
@@ -99,17 +103,35 @@ function Employee() {
           />
           <Column title="Tin Number" dataIndex="tinNumber" key="tinNumber" />
 
-          <Column title="Salary" dataIndex="salary" key="salary" />
-          <Column title="Bank Acc." dataIndex="bankAccount" key="bankAccount" />
           <Column
-            title="Deduction Start Date"
-            dataIndex="deductionStartDate"
-            key="deductionStartDate"
+            title="Non Taxable Allowance"
+            dataIndex="Non_Taxable_Allowance"
+            key="Non_Taxable_Allowance"
           />
           <Column
-            title="Deduction End Date"
-            dataIndex="deductionEndDate"
-            key="deductionEndDate"
+            title="Taxable Allowance"
+            dataIndex="Taxable_Allowance"
+            key="Taxable_Allowance"
+          />
+          <Column
+            title="Overtime Hours"
+            dataIndex="Overtime_Hours"
+            key="Overtime_Hours"
+          />
+          <Column
+            title="Sales Commission Allowance"
+            dataIndex="Sales_Commission_Allowance"
+            key="Sales_Commission_Allowance"
+          />
+          <Column
+            title="Night Working Hours"
+            dataIndex="Night_Working_Hours"
+            key="Night_Working_Hours"
+          />
+          <Column
+            title="Sunday Working Hours"
+            dataIndex="Sunday_Working_Hours"
+            key="Sunday_Working_Hours"
           />
           <Column
             title="Action"
@@ -117,28 +139,12 @@ function Employee() {
             render={(_, record) => (
               <div className="flex flex-col md:flex-row gap-2">
                 <Button
-                  type="default"
-                  onClick={() => navigate("/payroll/1")}
-                  className="w-full md:w-auto"
-                >
-                  <EyeOutlined />
-                  View
-                </Button>
-                <Button
                   type="primary"
                   onClick={showDrawer}
                   className="w-full md:w-auto bg-purple-500 text-white"
                 >
                   <CheckCircleOutlined />
                   Edit
-                </Button>
-                <Button
-                  type="default"
-                  // onClick={() => handleViewDetail(record)}
-                  className="w-3 md:w-auto"
-                >
-                  <HolderOutlined />
-                  Hold
                 </Button>
                 <Button
                   color="danger"
@@ -153,8 +159,8 @@ function Employee() {
           />
         </Table>
       </div>
-      <EditEmployee open={open} onClose={() => setOpen(false)} />
-      <AddEmployee
+      <EditAllowance open={open} onClose={() => setOpen(false)} />
+      <AddAllowance
         isModalOpen={isModalOpen}
         handleOk={handleOk}
         handleCancel={handleCancel}
@@ -165,10 +171,10 @@ function Employee() {
         // onOk={handleDeleteOk}
         onCancel={handleDeleteCancel}
       >
-        <p>Are you sure you want to delete the employee ?</p>
+        <p>Are you sure you want to delete the employee allownance ?</p>
       </Modal>
     </>
   );
 }
 
-export default Employee;
+export default Allowance;
