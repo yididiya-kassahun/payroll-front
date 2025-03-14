@@ -17,19 +17,20 @@ import {
   Spin,
   Table,
 } from "antd";
-import { addLoan } from "../../../services/employeeService";
-import { useMutation } from "@tanstack/react-query";
+import { addLoan, fetchAllowance, fetchLoanHistory, fetchTaxes } from "../../../services/employeeService";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import ErrorBlock from "../../../components/UI/ErrorBlock";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment/moment";
+import { fetchPayroll } from "../../../services/payrollService";
 
 const { Column } = Table;
 
 function Payroll() {
   const navigate = useNavigate();
   const location = useLocation();
- // const { id } = useParams();
- const [form] = Form.useForm();
+  // const { id } = useParams();
+  const [form] = Form.useForm();
 
   const { record } = location.state || {};
 
@@ -37,7 +38,7 @@ function Payroll() {
     mutationFn: addLoan,
     onSuccess: (data) => {
       message.success("Load added successfully!");
-      form.resetFields(); 
+      form.resetFields();
     },
     onError: (error) => {
       message.error("Failed to add load data: " + error.message);
@@ -45,78 +46,71 @@ function Payroll() {
     },
   });
 
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["payroll", record?.tinNumber],
+    queryFn: () => fetchPayroll(record.tinNumber),
+    keepPreviousData: true,
+    staleTime: 5000,
+    enabled: !!record?.tinNumber,
+  });
+
+   const { data: loanData } = useQuery({
+     queryKey: ["loan", record?.tinNumber],
+     queryFn: () => fetchLoanHistory(record.tinNumber),
+     keepPreviousData: true,
+     staleTime: 5000,
+     enabled: !!record?.tinNumber,
+   });
+
+    const { data: taxData } = useQuery({
+      queryKey: ["tax", record?.tinNumber],
+      queryFn: () => fetchTaxes(record.tinNumber),
+      keepPreviousData: true,
+      staleTime: 5000,
+      enabled: !!record?.tinNumber,
+    });
+
+  const payrollData = data?.payroll ? [data.payroll] : [];
+  const loanHistory = loanData?.loan ? [loanData.loan] : [];
+  const tax = taxData?.tax;
+
+  console.log(loanData);
+
   const reportData = [
     {
       label: "Taxable Income",
-      value: "3882",
+      value: tax.taxable_income,
       icon: <UsergroupAddOutlined className="text-3xl text-blue-500" />,
       bgColor: "bg-blue-100",
       textColor: "text-blue-600",
     },
     {
       label: "Income Tax",
-      value: "532",
+      value: tax.income_tax,
       icon: <BookOutlined className="text-3xl text-yellow-500" />,
       bgColor: "bg-yellow-100",
       textColor: "text-yellow-600",
     },
     {
       label: "Employer Pension Contribution",
-      value: "12.6%",
+      value: tax.employer_pension_contribution,
       icon: <SwapRightOutlined className="text-3xl text-green-500" />,
       bgColor: "bg-green-100",
       textColor: "text-green-600",
     },
     {
       label: "Employee Pension Contribution",
-      value: "440",
+      value: tax.employee_pension_contribution,
       icon: <MessageOutlined className="text-3xl text-purple-500" />,
       bgColor: "bg-purple-100",
       textColor: "text-purple-600",
     },
   ];
 
-  const payrollData = [
-    {
-      key: "1",
-      Gross_Earning: "31231",
-      Taxable_Income: "2300",
-      Income_Tax: "3200",
-      Employer_Pension_Contribution: "10",
-      Employee_Pension_Contribution: "54",
-      Loan_Deductions: "1200",
-      Food_Deduction: "32",
-      Penalty_Deductions: "12",
-      Net_Pay: "2",
-    },
-    {
-      key: "2",
-      Gross_Earning: "31231",
-      Taxable_Income: "2300",
-      Income_Tax: "3200",
-      Employer_Pension_Contribution: "10",
-      Employee_Pension_Contribution: "54",
-      Loan_Deductions: "1200",
-      Food_Deduction: "32",
-      Penalty_Deductions: "12",
-      Net_Pay: "2",
-    },
-    {
-      key: "3",
-      Gross_Earning: "31231",
-      Taxable_Income: "2300",
-      Income_Tax: "3200",
-      Employer_Pension_Contribution: "10",
-      Employee_Pension_Contribution: "54",
-      Loan_Deductions: "1200",
-      Food_Deduction: "32",
-      Penalty_Deductions: "12",
-      Net_Pay: "2",
-    },
-  ];
-
   function handleLoanForm(values) {
-    const startDateFormatted = moment(values.Deduction_Start_Date).format("YYY-MM-DD");
+    const startDateFormatted = moment(values.Deduction_Start_Date).format(
+      "YYY-MM-DD"
+    );
 
     const payload = {
       tin_number: record.tinNumber,
@@ -152,46 +146,46 @@ function Payroll() {
         ))}
       </div>
 
-      <div className="bg-white shadow-md mt-10">
+      <div className="bg-white shadow-md mt-10 p-4">
         <Table dataSource={payrollData}>
           <Column
             title="Gross Earning"
-            dataIndex="Gross_Earning"
-            key="Gross_Earning"
+            dataIndex="gross_earning"
+            key="gross_earning"
           />
           <Column
             title="Taxable Income"
-            dataIndex="Taxable_Income"
-            key="Taxable_Income"
+            dataIndex="taxable_income"
+            key="taxable_income"
           />
 
-          <Column title="Income Tax" dataIndex="Income_Tax" key="Income_Tax" />
+          <Column title="Income Tax" dataIndex="income_tax" key="income_tax" />
           <Column
             title="Employer Pension Contribution"
-            dataIndex="Employer_Pension_Contribution"
-            key="Employer_Pension_Contribution"
+            dataIndex="employer_pension_contribution"
+            key="employer_pension_contribution"
           />
           <Column
             title="Employee Pension Contribution"
-            dataIndex="Employee_Pension_Contribution"
-            key="Employee_Pension_Contribution"
+            dataIndex="employee_pension_contribution"
+            key="employee_pension_contribution"
           />
           <Column
             title="Loan Deductions"
-            dataIndex="Loan_Deductions"
-            key="Loan_Deductions"
+            dataIndex="loan_deductions"
+            key="loan_deductions"
           />
           <Column
             title="Food Deduction"
-            dataIndex="Food_Deduction"
-            key="Food_Deduction"
+            dataIndex="food_deduction"
+            key="food_deduction"
           />
           <Column
             title="Penalty Deductions"
-            dataIndex="Penalty_Deductions"
-            key="Penalty_Deductions"
+            dataIndex="penalty_deductions"
+            key="penalty_deductions"
           />
-          <Column title="Net Pay" dataIndex="Net_Pay" key="Net_Pay" />
+          <Column title="Net Pay" dataIndex="net_pay" key="net_pay" />
         </Table>
       </div>
 
@@ -200,7 +194,7 @@ function Payroll() {
         <Col span={12}>
           <div className="bg-white shadow-md p-6 mt-10 rounded-lg">
             <h2 className="text-xl font-bold mb-4">Add Loan</h2>
-            
+
             <Form name="addLoan" layout="vertical" onFinish={handleLoanForm}>
               <Form.Item
                 label="Loan Amount"
@@ -270,7 +264,7 @@ function Payroll() {
         <Col span={12}>
           <div className="bg-white shadow-md p-6 mt-10 rounded-lg">
             <h2 className="text-xl font-bold mb-4">Loan Payment History</h2>
-            <Table pagination={{ pageSize: 5 }}>
+            <Table dataSource={loanHistory} pagination={{ pageSize: 5 }}>
               <Column
                 title="Loan Amount"
                 dataIndex="Loan_Amount"
@@ -285,13 +279,13 @@ function Payroll() {
                 title="Start Date"
                 dataIndex="Deduction_Start_Date"
                 key="Deduction_Start_Date"
-                render={(date) => date.toString()}
+                render={(date) => moment(date).format("DD-MM-YYYY")}
               />
               <Column
                 title="End Date"
                 dataIndex="Deduction_End_Date"
                 key="Deduction_End_Date"
-                render={(date) => date.toString()}
+                render={(date) => moment(date).format("DD-MM-YYYY")}
               />
             </Table>
           </div>

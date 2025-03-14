@@ -40,3 +40,13 @@ export const addLoan = async (fields) => {
     throw error;
   }
 };
+
+export const fetchLoanHistory = async (tin) => {
+  const loan = await axios.get(`${API_BASE_URL}/loan?tin_number=${tin}`);
+  return loan.data;
+};
+
+export const fetchTaxes= async (tin) => {
+  const tax = await axios.get(`${API_BASE_URL}/tax?tin_number=${tin}`);
+  return tax.data;
+};
