@@ -8,122 +8,175 @@ import {
   Row,
   Col,
   Typography,
+  Spin,
 } from "antd";
-import farmImage from "../../../assets/logo/logo.jpg";
+import coverImg from "../../../assets/imgs/cover1.jpg";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { signin } from "../../../services/authService";
+import ErrorBlock from "../../../components/UI/ErrorBlock";
 
 const { Title, Text } = Typography;
 
-const onFinish = (values) => {
-  console.log("Success:", values);
-};
+function Signin() {
+  const navigate = useNavigate();
 
-const onFinishFailed = (errorInfo) => {
-  console.log("Failed:", errorInfo);
-};
+  const { mutate, isError, error, isLoading, isPending } = useMutation({
+    mutationFn: signin,
+    onSuccess: async (data) => {
+      const token = data?.token;
 
-const Signin = () => (
-  <Row
-    justify="center"
-    align="middle"
-    style={{ minHeight: "100vh", backgroundColor: "#f0f2f5", padding: "20px" }}
-  >
-    <Col xs={24} sm={20} md={16} lg={12} xl={10}>
-      <Card
-        bordered={false}
-        style={{ borderRadius: "12px", overflow: "hidden" }}
+      if (token) {
+        localStorage.setItem("authToken", token);
+        navigate("/home");
+      } else {
+        console.error("Auth failed");
+        //navigate(-1);
+      }
+    },
+    onError: (err) => {
+      console.error("Login failed:", err);
+    },
+  });
+
+  const handleFinish = (values) => {
+    mutate(values);
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
+
+  return (
+    <>
+      <Row
+        justify="center"
+        align="middle"
+        className="min-h-screen bg-gray-100 p-2"
       >
-        <Row gutter={[16, 16]}>
-          {/* Left Side - Image */}
-          <Col xs={0} md={10}>
-            <Card
-              bordered={false}
-              style={{
-                height: "100%",
-                overflow: "hidden",
-                boxShadow: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              cover={
+        <Col xs={24} sm={20} md={16} lg={12} xl={10}>
+          <Card
+            className="rounded-lg overflow-hidden shadow-md"
+            bordered={false}
+            bodyStyle={{ padding: 0 }}
+          >
+            <Row gutter={0}>
+              {/* Left Side - Image */}
+              <Col
+                xs={0}
+                md={12}
+                className="hidden sm:flex items-center justify-center bg-gray-200"
+                style={{
+                  height: "100%",
+                  overflow: "hidden",
+                  borderTopLeftRadius: "12px",
+                  borderBottomLeftRadius: "12px",
+                }}
+              >
                 <img
-                  src={farmImage}
+                  src={coverImg}
                   alt="Signin Illustration"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover", // Ensures the image covers the card without distortion
-                    borderRadius: "8px",
-                  }}
+                  className="w-full h-full object-cover"
                 />
-              }
-            />
-          </Col>
+              </Col>
 
-          {/* Right Side - Form */}
-          <Col xs={24} md={14}>
-            <Title
-              level={3}
-              style={{ textAlign: "center", marginBottom: "16px" }}
-            >
-              Sign In
-            </Title>
-            <Form
-              name="signin"
-              layout="vertical"
-              initialValues={{ remember: true }}
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              autoComplete="off"
-            >
-              <Form.Item
-                label="Email"
-                name="email"
-                rules={[
-                  { required: true, message: "Please input your email!" },
-                ]}
-              >
-                <Input placeholder="Enter your email" />
-              </Form.Item>
-
-              <Form.Item
-                label="Password"
-                name="password"
-                rules={[
-                  { required: true, message: "Please input your password!" },
-                ]}
-              >
-                <Input.Password placeholder="Enter your password" />
-              </Form.Item>
-
-              <Form.Item name="remember" valuePropName="checked">
-                <Checkbox>Remember me</Checkbox>
-              </Form.Item>
-
-              <Form.Item>
-                <Button
-                  type="primary"
-                  color="default"
-                  variant="solid"
-                  className="py-5"
-                  htmlType="submit"
-                  block
+              {/* Right Side - Form */}
+              <Col xs={24} md={12} className="p-6">
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "550px",
+                    width: "100%",
+                    // maxWidth: "500px",
+                  }}
                 >
-                  Sign In
-                </Button>
-              </Form.Item>
-            </Form>
-            <Text
-              type="secondary"
-              style={{ display: "block", textAlign: "center" }}
-            >
-              Don't have an account? <a href="/signup">Sign up</a>
-            </Text>
-          </Col>
-        </Row>
-      </Card>
-    </Col>
-  </Row>
-);
+                  <Title
+                    level={3}
+                    style={{ textAlign: "center", marginBottom: "16px" }}
+                  >
+                    Sign In
+                  </Title>
+                  <Form
+                    name="signin"
+                    layout="vertical"
+                    initialValues={{ remember: true }}
+                    onFinish={handleFinish}
+                    onFinishFailed={onFinishFailed}
+                    autoComplete="off"
+                    style={{width:"260px"}}
+                  >
+                    <Form.Item
+                      label="Email"
+                      name="email"
+                      rules={[
+                        { required: true, message: "Please input your email!" },
+                      ]}
+                    >
+                      <Input placeholder="Enter your email" />
+                    </Form.Item>
+
+                    <Form.Item
+                      label="Password"
+                      name="password"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input your password!",
+                        },
+                      ]}
+                    >
+                      <Input.Password placeholder="Enter your password" />
+                    </Form.Item>
+
+                    <Form.Item name="remember" valuePropName="checked">
+                      <Checkbox>Remember me</Checkbox>
+                    </Form.Item>
+
+                    <Form.Item>
+                      <Button
+                        type="primary"
+                        color="default"
+                        variant="solid"
+                        className="py-5"
+                        htmlType="submit"
+                        loading={isLoading}
+                        block
+                      >
+                        Sign In
+                      </Button>
+                    </Form.Item>
+                  </Form>
+                </div>
+                {isError && (
+                  <ErrorBlock
+                    title="Unauthorized"
+                    message={
+                      error?.response?.data?.message ||
+                      "Failed to login. Please check your credentials."
+                    }
+                  />
+                )}
+                {isPending && (
+                  <Card>
+                    <Spin /> Loading ...
+                  </Card>
+                )}
+                <Text
+                  type="secondary"
+                  style={{ display: "block", textAlign: "center" }}
+                >
+                  Don't have an account? <a href="/signup">Sign up</a>
+                </Text>
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+      </Row>
+    </>
+  );
+}
 
 export default Signin;

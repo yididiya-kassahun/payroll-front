@@ -1,11 +1,6 @@
-import React, { useState } from "react";
-import { Table, Tag, Button, Modal } from "antd";
-import {
-  CheckCircleOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  HolderOutlined,
-} from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import { Table, Button, Modal } from "antd";
+import { CheckCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 import EditAllowance from "./EditAllowance";
 import AddAllowance from "./AddAllowance";
 import { fetchAllowance } from "../../services/employeeService";
@@ -14,11 +9,12 @@ import { useQuery } from "@tanstack/react-query";
 const { Column } = Table;
 
 function Allowance() {
-  const [open, setOpen] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
-  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [selectedAllowance, setSelectedAllowance] = useState(null);
+  const [employeeTinNumbers, setEmployeeTinNumbers] = useState([]); // State to hold TIN numbers
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["allowance"],
@@ -27,20 +23,28 @@ function Allowance() {
     staleTime: 5000,
   });
 
-  const showDrawer = (record) => {
-    setOpen(true);
-    setSelectedRecord(record);
-  };
+  // Extract TIN numbers from data when it's available
+  useEffect(() => {
+    if (data?.allowances) {
+      const tinNumbers = data.allowances.map(
+        (allowance) => allowance.employee_tin
+      );
+      //Remove duplicate tin numbers
+      const uniqueTinNumbers = [...new Set(tinNumbers)];
+      setEmployeeTinNumbers(uniqueTinNumbers);
+    }
+  }, [data]);
 
-  const showModal = () => {
+  const showAddModal = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
+  const handleAddOk = () => {
     setIsModalOpen(false);
+    refetch();
   };
 
-  const handleCancel = () => {
+  const handleAddCancel = () => {
     setIsModalOpen(false);
   };
 
@@ -54,10 +58,27 @@ function Allowance() {
     setRecordToDelete(null);
   };
 
+  const handleDeleteOk = async () => {
+    console.log("Deleting allowance with ID:", recordToDelete.id); // Replace with your delete logic
+    setIsDeleteModalOpen(false);
+    setRecordToDelete(null);
+    refetch();
+  };
+
+  const showEditDrawer = (record) => {
+    setSelectedAllowance(record);
+    setOpenEditModal(true);
+  };
+
+  const closeEditDrawer = () => {
+    setOpenEditModal(false);
+    setSelectedAllowance(null);
+  };
+
   const dataSource = data?.allowances?.map((allowance) => ({
     key: allowance.id,
     tinNumber: allowance.employee_tin,
-    name: "N/A",
+    name: allowance.Employee_Name,
     Non_Taxable_Allowance: allowance.non_taxable_allowance,
     Taxable_Allowance: allowance.taxable_allowance,
     Overtime_Hours: allowance.overtime_hours,
@@ -75,7 +96,7 @@ function Allowance() {
         <Button
           className="text-white py-5"
           style={{ backgroundColor: "#001529" }}
-          onClick={showModal}
+          onClick={showAddModal}
         >
           + Add Employee Allowance
         </Button>
@@ -127,7 +148,7 @@ function Allowance() {
               <div className="flex flex-col md:flex-row gap-2">
                 <Button
                   type="primary"
-                  onClick={() => showDrawer(record)}
+                  onClick={() => showEditDrawer(record)}
                   className="w-full md:w-auto bg-purple-500 text-white"
                 >
                   <CheckCircleOutlined />
@@ -147,19 +168,21 @@ function Allowance() {
         </Table>
       </div>
       <EditAllowance
-        open={open}
-        onClose={() => setOpen(false)}
-        allowanceData={selectedRecord}
+        open={openEditModal}
+        onClose={closeEditDrawer}
+        allowanceData={selectedAllowance}
+        refetch={refetch}
       />
       <AddAllowance
         isModalOpen={isModalOpen}
-        handleOk={handleOk}
-        handleCancel={handleCancel}
+        handleOk={handleAddOk}
+        handleCancel={handleAddCancel}
+        tinNumbers={employeeTinNumbers} // Pass the TIN numbers as a prop
       />
       <Modal
         title="Delete"
         open={isDeleteModalOpen}
-        // onOk={handleDeleteOk}
+        onOk={handleDeleteOk}
         onCancel={handleDeleteCancel}
       >
         <p>Are you sure you want to delete the employee allownance ?</p>

@@ -8,7 +8,6 @@ const Logout = () => {
     (async () => {
       try {
         localStorage.removeItem("authToken");
-        //localStorage.removeItem("resetToken");
         navigate("/signin");
       } catch (error) {
         console.error("Error during logout:", error);

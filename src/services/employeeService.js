@@ -21,10 +21,22 @@ export const fetchAllowance = async () => {
 
 export const addAllowance = async (fields) => {
   const response = await axios.post(`${API_BASE_URL}/allowance`, fields);
+  console.log("allownace response ", response);
   return response;
 };
 
 export const editAllowance = async (fields) => {
   const response = await axios.post(`${API_BASE_URL}/allowance`, fields);
   return response;
+};
+
+export const addLoan = async (fields) => {
+  try {
+    console.log("loan fields ", fields);
+    const response = await axios.post(`${API_BASE_URL}/loan`, fields);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding loan:", error);
+    throw error;
+  }
 };

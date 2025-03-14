@@ -16,18 +16,22 @@ import Signin from "./pages/Auth/SignIn/Signin";
 import Signup from "./pages/Auth/Signup/Signup";
 import Logout from "./pages/Auth/Logout";
 
+import ProtectedRoute from "./utils/ProtectedRoute";
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard />}>
-            <Route path="home" element={<Home />} />
-            <Route path="employee" element={<Employee />} />
-            <Route path="payroll/:id" element={<Payroll />} />
-            <Route path="account" element={<Account />} />
-            <Route path="allowance" element={<Allowance />} />
-            <Route path="setting" element={<Setting />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Dashboard />}>
+              <Route path="home" element={<Home />} />
+              <Route path="employee" element={<Employee />} />
+              <Route path="payroll/:id" element={<Payroll />} />
+              <Route path="account" element={<Account />} />
+              <Route path="allowance" element={<Allowance />} />
+              <Route path="setting" element={<Setting />} />
+            </Route>
           </Route>
 
           <Route path="signin" element={<Signin />} />

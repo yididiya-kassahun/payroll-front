@@ -1,23 +1,37 @@
 import {
   Modal,
   Form,
-  Input,
   InputNumber,
-  DatePicker,
   Button,
   Row,
   Col,
   Select,
+  message,
 } from "antd";
+import { addAllowance } from "../../services/employeeService";
+import { useMutation } from "@tanstack/react-query";
 
 const { Option } = Select;
 
-const AddAllowance = ({ isModalOpen, handleOk, handleCancel }) => {
+const AddAllowance = ({ isModalOpen, handleOk, handleCancel, tinNumbers }) => {
   const [form] = Form.useForm();
 
+  const { mutate } = useMutation({
+    mutationFn: addAllowance,
+    onSuccess: (data) => {
+      message.success("Allowance record added!");
+      form.resetFields();
+      handleOk();
+    },
+    onError: (error) => {
+      message.error("Allowance already exist");
+      console.log("Mutation error:", error.message);
+      handleCancel();
+    },
+  });
+
   const handleFinish = (values) => {
-    console.log("Form values:", values);
-    form.resetFields();
+    mutate(values);
   };
 
   return (
@@ -35,12 +49,22 @@ const AddAllowance = ({ isModalOpen, handleOk, handleCancel }) => {
         onFinish={handleFinish}
         className="space-y-4 mt-10"
       >
-        <Form.Item name="tin_number" label="Select Tin Number">
-          <Select>
-            <Option>123231</Option>
-            <Option>123231</Option>
-            <Option>123231</Option>
-            <Option>123231</Option>
+        <Form.Item
+          label="Employee TIN"
+          name="tin_number"
+          rules={[
+            {
+              required: true,
+              message: "Please select an employee TIN!",
+            },
+          ]}
+        >
+          <Select placeholder="Select an employee TIN">
+            {tinNumbers.map((tin) => (
+              <Option key={tin} value={tin}>
+                {tin}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
 

@@ -106,7 +106,9 @@ function Employee() {
               <div className="flex flex-col md:flex-row gap-2">
                 <Button
                   type="default"
-                  onClick={() => navigate("/payroll/1")}
+                  onClick={() =>
+                    navigate(`/payroll/${record.tinNumber}`, { state: { record } })
+                  }
                   className="w-full md:w-auto"
                 >
                   <EyeOutlined />

@@ -84,6 +84,7 @@ const Dashboard = () => {
               key: "6",
               icon: <LogoutOutlined />,
               label: "Logout",
+              onClick: () => navigate("/logout"),
             },
           ]}
         />

@@ -5,11 +5,46 @@ import {
   SwapRightOutlined,
   MessageOutlined,
 } from "@ant-design/icons";
-import { Button, Col, DatePicker, Form, InputNumber, Row, Table } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Form,
+  InputNumber,
+  message,
+  Row,
+  Spin,
+  Table,
+} from "antd";
+import { addLoan } from "../../../services/employeeService";
+import { useMutation } from "@tanstack/react-query";
+import ErrorBlock from "../../../components/UI/ErrorBlock";
+import { useLocation, useNavigate } from "react-router-dom";
+import moment from "moment/moment";
 
 const { Column } = Table;
 
 function Payroll() {
+  const navigate = useNavigate();
+  const location = useLocation();
+ // const { id } = useParams();
+ const [form] = Form.useForm();
+
+  const { record } = location.state || {};
+
+  const { mutate, isError, isPending, error } = useMutation({
+    mutationFn: addLoan,
+    onSuccess: (data) => {
+      message.success("Load added successfully!");
+      form.resetFields(); 
+    },
+    onError: (error) => {
+      message.error("Failed to add load data: " + error.message);
+      console.log("Mutation error:", error.message);
+    },
+  });
+
   const reportData = [
     {
       label: "Taxable Income",
@@ -55,7 +90,7 @@ function Payroll() {
       Net_Pay: "2",
     },
     {
-      key: "1",
+      key: "2",
       Gross_Earning: "31231",
       Taxable_Income: "2300",
       Income_Tax: "3200",
@@ -67,7 +102,7 @@ function Payroll() {
       Net_Pay: "2",
     },
     {
-      key: "1",
+      key: "3",
       Gross_Earning: "31231",
       Taxable_Income: "2300",
       Income_Tax: "3200",
@@ -79,6 +114,19 @@ function Payroll() {
       Net_Pay: "2",
     },
   ];
+
+  function handleLoanForm(values) {
+    const startDateFormatted = moment(values.Deduction_Start_Date).format("YYY-MM-DD");
+
+    const payload = {
+      tin_number: record.tinNumber,
+      Loan_Amount: values.Loan_Amount,
+      Loan_Deduction_Per_Month: values.Loan_Deduction_Per_Month,
+      Deduction_Start_Date: startDateFormatted,
+    };
+
+    mutate(payload);
+  }
 
   return (
     <div className="items-center justify-center bg-gray-100 p-2">
@@ -152,7 +200,8 @@ function Payroll() {
         <Col span={12}>
           <div className="bg-white shadow-md p-6 mt-10 rounded-lg">
             <h2 className="text-xl font-bold mb-4">Add Loan</h2>
-            <Form layout="vertical">
+            
+            <Form name="addLoan" layout="vertical" onFinish={handleLoanForm}>
               <Form.Item
                 label="Loan Amount"
                 name="Loan_Amount"
@@ -186,7 +235,7 @@ function Payroll() {
                     label="Deduction End Date"
                     name="Deduction_End_Date"
                   >
-                    <DatePicker className="w-full" />
+                    <DatePicker className="w-full" disabled />
                   </Form.Item>
                 </Col>
               </Row>
@@ -201,8 +250,23 @@ function Payroll() {
                 Add Loan
               </Button>
             </Form>
+            {isError && (
+              <ErrorBlock
+                title="Submission Failed"
+                message={
+                  error?.response?.data?.message ||
+                  "Failed to add loan. Please try again."
+                }
+              />
+            )}
+            {isPending && (
+              <Card>
+                <Spin /> Loading ...
+              </Card>
+            )}
           </div>
         </Col>
+
         <Col span={12}>
           <div className="bg-white shadow-md p-6 mt-10 rounded-lg">
             <h2 className="text-xl font-bold mb-4">Loan Payment History</h2>
