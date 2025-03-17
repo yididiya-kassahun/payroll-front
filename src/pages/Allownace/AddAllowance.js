@@ -15,6 +15,7 @@ const { Option } = Select;
 
 const AddAllowance = ({ isModalOpen, handleOk, handleCancel, tinNumbers }) => {
   const [form] = Form.useForm();
+  console.log("tin numbers ",tinNumbers);
 
   const { mutate } = useMutation({
     mutationFn: addAllowance,

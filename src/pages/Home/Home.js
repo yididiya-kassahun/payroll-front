@@ -88,7 +88,7 @@ function Dashboard() {
         },
         {
           label: "Average Net Pay",
-          value: stat.averageNetPay,
+          value: (stat.averageNetPay).toFixed(3),
           icon: <SwapRightOutlined className="text-3xl text-green-500" />,
           textColor: "text-green-600",
           bgImage: card3,

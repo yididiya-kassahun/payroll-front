@@ -20,6 +20,7 @@ const AddEmployee = ({ isModalOpen, handleOk, handleCancel }) => {
       message.success("Employee record added!");
       form.resetFields();
       handleOk();
+      window.location.reload();
     },
     onError: (error) => {
       message.error("Employee already exist");
@@ -48,6 +49,13 @@ const AddEmployee = ({ isModalOpen, handleOk, handleCancel }) => {
         onFinish={handleFinish}
         className="space-y-4 mt-10"
       >
+        <Form.Item
+          name="Employee_Email"
+          label="Employee Email"
+          rules={[{ required: true, message: "Email is required" }]}
+        >
+          <Input placeholder="Enter Employee Email Address" />
+        </Form.Item>
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item

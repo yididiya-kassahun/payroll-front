@@ -5,6 +5,7 @@ import EditAllowance from "./EditAllowance";
 import AddAllowance from "./AddAllowance";
 import { fetchAllowance } from "../../services/employeeService";
 import { useQuery } from "@tanstack/react-query";
+import { API_BASE_URL } from "../../config";
 
 const { Column } = Table;
 
@@ -16,6 +17,8 @@ function Allowance() {
   const [selectedAllowance, setSelectedAllowance] = useState(null);
   const [employeeTinNumbers, setEmployeeTinNumbers] = useState([]); // State to hold TIN numbers
 
+  const token = localStorage.getItem("authToken");
+
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["allowance"],
     queryFn: () => fetchAllowance(),
@@ -23,17 +26,35 @@ function Allowance() {
     staleTime: 5000,
   });
 
-  // Extract TIN numbers from data when it's available
   useEffect(() => {
-    if (data?.allowances) {
-      const tinNumbers = data.allowances.map(
-        (allowance) => allowance.employee_tin
-      );
-      //Remove duplicate tin numbers
-      const uniqueTinNumbers = [...new Set(tinNumbers)];
-      setEmployeeTinNumbers(uniqueTinNumbers);
-    }
-  }, [data]);
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/employees`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, 
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch employees");
+        }
+
+        const result = await response.json();
+
+        if (result?.employees) {
+          const tinNumbers = result.employees.map((emp) => emp.Employee_TIN);
+          const uniqueTinNumbers = [...new Set(tinNumbers)];
+          setEmployeeTinNumbers(uniqueTinNumbers);
+        }
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
 
   const showAddModal = () => {
     setIsModalOpen(true);
@@ -59,7 +80,7 @@ function Allowance() {
   };
 
   const handleDeleteOk = async () => {
-    console.log("Deleting allowance with ID:", recordToDelete.id); // Replace with your delete logic
+    console.log("Deleting allowance with ID:", recordToDelete.id); 
     setIsDeleteModalOpen(false);
     setRecordToDelete(null);
     refetch();
@@ -177,7 +198,7 @@ function Allowance() {
         isModalOpen={isModalOpen}
         handleOk={handleAddOk}
         handleCancel={handleAddCancel}
-        tinNumbers={employeeTinNumbers} // Pass the TIN numbers as a prop
+        tinNumbers={employeeTinNumbers} 
       />
       <Modal
         title="Delete"

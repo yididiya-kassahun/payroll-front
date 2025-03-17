@@ -15,6 +15,11 @@ export const signup = async (fields) => {
 };
 
 export const changePassword = async (fields) => {
-  const response = await axios.post(`${API_BASE_URL}/auth/changepass`, fields);
+  const token = localStorage.getItem("authToken");
+  const response = await axios.post(`${API_BASE_URL}/auth/changepass`, fields, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response;
 };
