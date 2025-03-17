@@ -4,8 +4,15 @@ import {
   BookOutlined,
   SwapRightOutlined,
   MessageOutlined,
+  ReloadOutlined,
+  DeleteOutlined,
+  FileExcelOutlined,
+  FilePdfOutlined,
+  FileWordOutlined,
+  MailOutlined,
 } from "@ant-design/icons";
 import {
+  Avatar,
   Button,
   Card,
   Col,
@@ -17,34 +24,29 @@ import {
   Spin,
   Table,
 } from "antd";
-import { addLoan, fetchAllowance, fetchLoanHistory, fetchTaxes } from "../../../services/employeeService";
+import {
+  addLoan,
+  fetchLoanHistory,
+  fetchTaxes,
+} from "../../../services/employeeService";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import ErrorBlock from "../../../components/UI/ErrorBlock";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment/moment";
-import { fetchPayroll } from "../../../services/payrollService";
+import { fetchPayroll, refreshPayroll, sendEmailToEmployee } from "../../../services/payrollService";
+import user from "../../../assets/imgs/user.png";
+import pdfFormatter from "../../../utils/reportFormatter/pdfFormatter";
+import ReportCards from "./ReportCards";
 
 const { Column } = Table;
 
-function Payroll() {
+function Payroll({ format }) {
   const navigate = useNavigate();
   const location = useLocation();
-  // const { id } = useParams();
   const [form] = Form.useForm();
+  // const { reportData, setReportData } = useReport();
 
   const { record } = location.state || {};
-
-  const { mutate, isError, isPending, error } = useMutation({
-    mutationFn: addLoan,
-    onSuccess: (data) => {
-      message.success("Load added successfully!");
-      form.resetFields();
-    },
-    onError: (error) => {
-      message.error("Failed to add load data: " + error.message);
-      console.log("Mutation error:", error.message);
-    },
-  });
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["payroll", record?.tinNumber],
@@ -54,100 +56,258 @@ function Payroll() {
     enabled: !!record?.tinNumber,
   });
 
-   const { data: loanData } = useQuery({
-     queryKey: ["loan", record?.tinNumber],
-     queryFn: () => fetchLoanHistory(record.tinNumber),
-     keepPreviousData: true,
-     staleTime: 5000,
-     enabled: !!record?.tinNumber,
-   });
+  const { mutate, isError, isPending, error } = useMutation({
+    mutationFn: addLoan,
+    onSuccess: (data) => {
+      message.success("Load added successfully!");
+      form.resetFields();
+      refetch();
+    },
+    onError: (error) => {
+      message.error("Failed to add load data: " + error.message);
+      console.log("Mutation error:", error.message);
+    },
+  });
 
-    const { data: taxData } = useQuery({
-      queryKey: ["tax", record?.tinNumber],
-      queryFn: () => fetchTaxes(record.tinNumber),
-      keepPreviousData: true,
-      staleTime: 5000,
-      enabled: !!record?.tinNumber,
-    });
+  const { data: loanData } = useQuery({
+    queryKey: ["loan", record?.tinNumber],
+    queryFn: () => fetchLoanHistory(record.tinNumber),
+    keepPreviousData: true,
+    staleTime: 5000,
+    enabled: !!record?.tinNumber,
+  });
 
-  const payrollData = data?.payroll ? [data.payroll] : [];
+  const { data: taxData, refetch: refetchTax } = useQuery({
+    queryKey: ["tax", record?.tinNumber],
+    queryFn: () => fetchTaxes("1234"),
+    keepPreviousData: true,
+    staleTime: 5000,
+    enabled: !!record?.tinNumber,
+  });
+
+ // const payrollData = data?.payroll ? [data.payroll] : [];
   const loanHistory = loanData?.loan ? [loanData.loan] : [];
   const tax = taxData?.tax;
 
-  console.log(loanData);
+ // console.log("Record Data:", record);
 
-  const reportData = [
-    {
-      label: "Taxable Income",
-      value: tax.taxable_income,
-      icon: <UsergroupAddOutlined className="text-3xl text-blue-500" />,
-      bgColor: "bg-blue-100",
-      textColor: "text-blue-600",
-    },
-    {
-      label: "Income Tax",
-      value: tax.income_tax,
-      icon: <BookOutlined className="text-3xl text-yellow-500" />,
-      bgColor: "bg-yellow-100",
-      textColor: "text-yellow-600",
-    },
-    {
-      label: "Employer Pension Contribution",
-      value: tax.employer_pension_contribution,
-      icon: <SwapRightOutlined className="text-3xl text-green-500" />,
-      bgColor: "bg-green-100",
-      textColor: "text-green-600",
-    },
-    {
-      label: "Employee Pension Contribution",
-      value: tax.employee_pension_contribution,
-      icon: <MessageOutlined className="text-3xl text-purple-500" />,
-      bgColor: "bg-purple-100",
-      textColor: "text-purple-600",
-    },
-  ];
+  const reportData2 = React.useMemo(() => {
+    if (isLoading) {
+      return Array(4).fill({ label: "Loading...", value: "Loading..." });
+    }
+
+    if (isError) {
+      return [
+        { label: "Error", value: error.message || "Failed to load tax data" },
+      ];
+    }
+
+    if (!tax) {
+      return [{ label: "No Data", value: "Tax information not available." }];
+    }
+
+    return [
+      {
+        label: "Taxable Income",
+        value: tax.taxable_income,
+        icon: <UsergroupAddOutlined className="text-3xl text-blue-500" />,
+        bgColor: "bg-blue-100",
+        textColor: "text-blue-600",
+      },
+      {
+        label: "Income Tax",
+        value: tax.income_tax,
+        icon: <BookOutlined className="text-3xl text-yellow-500" />,
+        bgColor: "bg-yellow-100",
+        textColor: "text-yellow-600",
+      },
+      {
+        label: "Employer Pension Contribution",
+        value: tax.employer_pension_contribution,
+        icon: <SwapRightOutlined className="text-3xl text-green-500" />,
+        bgColor: "bg-green-100",
+        textColor: "text-green-600",
+      },
+      {
+        label: "Employee Pension Contribution",
+        value: tax.employee_pension_contribution,
+        icon: <MessageOutlined className="text-3xl text-purple-500" />,
+        bgColor: "bg-purple-100",
+        textColor: "text-purple-600",
+      },
+    ];
+  }, [tax, isLoading, isError, error]);
 
   function handleLoanForm(values) {
-    const startDateFormatted = moment(values.Deduction_Start_Date).format(
-      "YYY-MM-DD"
-    );
+    // const startDateFormatted = moment(values.Deduction_Start_Date).format(
+    //   "YYY-MM-DD"
+    // );
 
     const payload = {
       tin_number: record.tinNumber,
       Loan_Amount: values.Loan_Amount,
       Loan_Deduction_Per_Month: values.Loan_Deduction_Per_Month,
-      Deduction_Start_Date: startDateFormatted,
+      Deduction_Start_Date: values.Deduction_Start_Date,
     };
 
     mutate(payload);
   }
 
+  const {
+    mutate: refreshPayrollMutate,
+    isLoading: isRefreshPayrollLoading,
+    // isError: isRefreshPayrollError,
+    // error: refreshPayrollError,
+  } = useMutation({
+    mutationFn: () => refreshPayroll(record?.tinNumber),
+    onSuccess: () => {
+      message.success("Payroll refreshed successfully!");
+      refetch();
+      refetchTax();
+    },
+    onError: (error) => {
+      message.error("Failed to refresh payroll: " + error.message);
+      console.error("Error refreshing payroll:", error);
+    },
+  });
+
+  const handleRefreshPayroll = () => {
+    refreshPayrollMutate();
+  };
+
+  const dataSource = data?.payrolls?.map((payroll, index) => ({
+    key: index,
+    employee_tin: payroll.employee_tin,
+    payroll_date: new Date(payroll.payroll_date).toLocaleDateString(),
+    gross_earning: payroll.gross_earning,
+    taxable_income: payroll.taxable_income,
+    income_tax: payroll.income_tax,
+    employer_pension_contribution: payroll.employer_pension_contribution,
+    employee_pension_contribution: payroll.employee_pension_contribution,
+    loan_deductions: payroll.loan_deductions,
+    food_deduction: payroll.food_deduction,
+    penalty_deductions: payroll.penalty_deductions,
+    net_pay: payroll.net_pay,
+    bank_account: payroll.bank_account,
+  }));
+
+  const buttonStyle = { size: "medium", type: "primary" };
+
+  const handleDownload = () => {
+    pdfFormatter(record, format);
+  };
+
+ 
+  const { mutate:emailMutate } = useMutation({
+    mutationFn: sendEmailToEmployee,
+    onSuccess: () => {
+      message.success("Email sent successfully!");
+    },
+    onError: (error) => {
+      message.error("Failed to send email: " + error.message);
+      console.error("Mutation error:", error);
+    },
+  });
+
+  const sendEmail = () => {
+
+    if (!record?.name || !record?.email) {
+      message.error("Employee name and email are required!");
+      return;
+    }
+
+    emailMutate({ name: record?.name, email: record?.email });
+  };
+
   return (
     <div className="items-center justify-center bg-gray-100 p-2">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-7xl w-full">
-        {reportData.map((item, index) => (
-          <div
-            key={index}
-            className={`bg-white p-6 rounded-xl shadow-lg flex flex-col`}
-            style={{
-              backgroundImage: `url(${item.bgImage})`,
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "bottom",
-            }}
-          >
-            <div className="flex items-center gap-2 mb-4">
-              {item.icon}
-              <h2 className={`text-sm font-semibold ${item.textColor}`}>
-                {item.label}
-              </h2>
+      <Row gutter={[16, 16]}>
+        {/* Employee Profile Column */}
+        <Col xs={24} sm={24} md={6}>
+          <Card className="shadow-md rounded-xl bg-gray-200 h-55">
+            <div className="flex items-center gap-4">
+              <Avatar size={64} src={user} />
+              <div>
+                <h2 className="font-semibold text-lg">
+                  {record?.name}
+                </h2>
+                <p className="text-gray-500 text-sm">
+                  Email: {record?.email}
+                </p>
+                <p className="text-gray-500 text-sm">
+                  Tin Number : {record?.tinNumber}
+                </p>
+              </div>
             </div>
-            <p className="text-2xl font-bold mb-4">{item.value}</p>
-          </div>
-        ))}
-      </div>
+          </Card>
+        </Col>
+
+        {/* Report Cards Column */}
+        <Col xs={24} sm={24} md={18} className="justify-end">
+          <ReportCards reportData={reportData2} />
+        </Col>
+      </Row>
 
       <div className="bg-white shadow-md mt-10 p-4">
-        <Table dataSource={payrollData}>
+        <Row gutter={[16, 16]} align="middle">
+          {/* File Export Buttons (Left Side) */}
+          <Col>
+            <Button
+              {...buttonStyle}
+              icon={<FileExcelOutlined />}
+              style={{ backgroundColor: "#28a745", borderColor: "#28a745" }}
+              key="excel"
+              onClick={handleDownload}
+            >
+              Excel
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              {...buttonStyle}
+              icon={<FilePdfOutlined />}
+              style={{ backgroundColor: "#dc3545", borderColor: "#dc3545" }}
+              onClick={handleDownload}
+            >
+              PDF
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              {...buttonStyle}
+              icon={<FileWordOutlined />}
+              style={{ backgroundColor: "#007bff", borderColor: "#007bff" }}
+              onClick={handleDownload}
+            >
+              Word
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              {...buttonStyle}
+              icon={<MailOutlined />}
+              style={{ backgroundColor: "#6c757d", borderColor: "#6c757d" }}
+              onClick={sendEmail}
+            >
+              Send Email
+            </Button>
+          </Col>
+
+          {/* Refresh Button (Right Side) */}
+          <Col flex="auto" style={{ textAlign: "right" }}>
+            <Button
+              className="mb-10"
+              color="default"
+              variant="solid"
+              onClick={handleRefreshPayroll}
+              disabled={isRefreshPayrollLoading}
+            >
+              <ReloadOutlined spin={isRefreshPayrollLoading} />
+              Refresh table
+            </Button>
+          </Col>
+        </Row>
+        <Table dataSource={dataSource}>
           <Column
             title="Gross Earning"
             dataIndex="gross_earning"
@@ -174,6 +334,7 @@ function Payroll() {
             title="Loan Deductions"
             dataIndex="loan_deductions"
             key="loan_deductions"
+            render={(value) => (value ? `- ${value}` : "-")}
           />
           <Column
             title="Food Deduction"
@@ -186,6 +347,18 @@ function Payroll() {
             key="penalty_deductions"
           />
           <Column title="Net Pay" dataIndex="net_pay" key="net_pay" />
+          <Column
+            title="Actions"
+            render={(_, record) => (
+              <Button
+                onClick={handleRefreshPayroll}
+                color="danger"
+                variant="solid"
+              >
+                <DeleteOutlined />
+              </Button>
+            )}
+          />
         </Table>
       </div>
 

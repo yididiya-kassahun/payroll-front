@@ -25,6 +25,8 @@ import card4 from "../../assets/cards/card4.svg";
 
 import PolarChart from "../../components/chart/PolarChart";
 import LineChart from "../../components/chart/LineChart";
+import { fetchStat } from "../../services/employeeService";
+import { useQuery } from "@tanstack/react-query";
 
 // Register Chart.js components
 ChartJS.register(
@@ -39,39 +41,67 @@ ChartJS.register(
 );
 
 function Dashboard() {
-  
-  const reportData = [
-    {
-      label: "Total Employee",
-      value: "3882",
-      icon: <UsergroupAddOutlined className="text-3xl text-blue-500" />,
-      textColor: "text-blue-600",
-      bgImage: card1,
-    },
-    {
-      label: "LIFETIME VALUE",
-      value: "532",
-      icon: <BookOutlined className="text-3xl text-yellow-500" />,
-      textColor: "text-yellow-600",
-      bgImage: card2,
-    },
-    {
-      label: "CONVERSION RATE",
-      value: "12.6%",
-      icon: <SwapRightOutlined className="text-3xl text-green-500" />,
-      textColor: "text-green-600",
-      bgImage: card3,
-    },
-    {
-      label: "ACTIVE TRIALS",
-      value: "440",
-      icon: <MessageOutlined className="text-3xl text-purple-500" />,
-      textColor: "text-purple-600",
-      bgImage: card4,
-    },
-  ];
 
+
+  const { data:stat, isLoading,isError, error, refetch } = useQuery({
+    queryKey: ["stat"],
+    queryFn: () => fetchStat(),
+    keepPreviousData: true,
+  });
   
+  if(isLoading){
+    console.log("loading... ");
+  }else{
+    console.log("data ", stat);
+  }
+ // const stat = data?.tax;
+
+    const reportData = React.useMemo(() => {
+      if (isLoading) {
+        return Array(4).fill({ label: "Loading...", value: "Loading..." });
+      }
+
+      if (isError) {
+        return [
+          { label: "Error", value: error.message || "Failed to load tax data" },
+        ];
+      }
+
+      if (!stat) {
+        return [{ label: "No Data", value: "Tax information not available." }];
+      }
+
+      return [
+        {
+          label: "Total Employee",
+          value: stat.totalEmployees,
+          icon: <UsergroupAddOutlined className="text-3xl text-blue-500" />,
+          textColor: "text-blue-600",
+          bgImage: card1,
+        },
+        {
+          label: "Total Payroll Expenses ",
+          value: stat.totalPayrollExpenses,
+          icon: <BookOutlined className="text-3xl text-yellow-500" />,
+          textColor: "text-yellow-600",
+          bgImage: card2,
+        },
+        {
+          label: "Average Net Pay",
+          value: stat.averageNetPay,
+          icon: <SwapRightOutlined className="text-3xl text-green-500" />,
+          textColor: "text-green-600",
+          bgImage: card3,
+        },
+        {
+          label: "Total Deductions",
+          value: stat.totalDeductions,
+          icon: <MessageOutlined className="text-3xl text-purple-500" />,
+          textColor: "text-purple-600",
+          bgImage: card4,
+        },
+      ];
+    }, [stat, isLoading, isError, error]);
 
   return (
     <div className="flex flex-col items-center bg-gray-100 p-6">
@@ -100,8 +130,8 @@ function Dashboard() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10 max-w-7xl w-full">
-        <LineChart />
-        <PolarChart />
+        <LineChart data={stat} isLoading={isLoading} />
+        <PolarChart data={stat} isLoading={isLoading} />
       </div>
     </div>
   );

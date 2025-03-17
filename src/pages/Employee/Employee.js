@@ -61,6 +61,7 @@ function Employee() {
   const dataSource = data?.employees?.map((employee) => ({
     key: employee.id,
     tinNumber: employee.Employee_TIN,
+    email: employee.Employee_Email,
     name: employee.Employee_Name,
     salary: employee.Basic_Salary,
     bankAccount: employee.Bank_Account,

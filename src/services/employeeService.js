@@ -46,7 +46,13 @@ export const fetchLoanHistory = async (tin) => {
   return loan.data;
 };
 
-export const fetchTaxes= async (tin) => {
+export const fetchTaxes = async (tin) => {
   const tax = await axios.get(`${API_BASE_URL}/tax?tin_number=${tin}`);
+  console.log("tax ", tax.data);
   return tax.data;
+};
+
+export const fetchStat = async () => {
+  const dashStat = await axios.get(`${API_BASE_URL}/dashboard-stat`);
+  return dashStat.data;
 };
