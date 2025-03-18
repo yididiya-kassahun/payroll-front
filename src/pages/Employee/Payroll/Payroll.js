@@ -50,7 +50,7 @@ function Payroll({ format }) {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["payroll", record?.tinNumber],
-    queryFn: () => fetchPayroll(record.tinNumber),
+    queryFn: () => fetchPayroll(record?.tinNumber),
     keepPreviousData: true,
     staleTime: 5000,
     enabled: !!record?.tinNumber,
@@ -89,7 +89,7 @@ function Payroll({ format }) {
   const loanHistory = loanData?.loan ? [loanData.loan] : [];
   const tax = taxData?.tax;
 
- // console.log("Record Data:", record);
+ //console.log("Record Data:", record);
 
   const reportData2 = React.useMemo(() => {
     if (isLoading) {
@@ -216,7 +216,7 @@ function Payroll({ format }) {
       return;
     }
 
-    emailMutate({ name: record?.name, email: record?.email });
+    emailMutate({ name: record?.name, email: record?.email, tinNumber:record?.tinNumber  });
   };
 
   return (

@@ -7,10 +7,25 @@ import {
   Input,
   InputNumber,
   Row,
+  message,
 } from "antd";
+import { useMutation } from "@tanstack/react-query";
+import { updateEmployee } from "../../../services/employeeService";  
 
 const EditEmployee = ({ open, onClose, record }) => {
   const [form] = Form.useForm();
+
+  // Mutation to update the employee
+  const mutation = useMutation({
+    mutationFn: updateEmployee,
+    onSuccess: () => {
+      message.success("Employee record updated successfully!");
+      onClose(); // Close the drawer on success
+    },
+    onError: (error) => {
+      message.error(`Failed to update employee: ${error.message}`);
+    },
+  });
 
   useEffect(() => {
     if (record) {
@@ -27,8 +42,7 @@ const EditEmployee = ({ open, onClose, record }) => {
   }, [form, record]);
 
   const onFinish = (values) => {
-    console.log("Success:", values);
-    onClose(); 
+    mutation.mutate(values); // Trigger mutation on form submit
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -72,18 +86,11 @@ const EditEmployee = ({ open, onClose, record }) => {
               <Form.Item
                 name="Basic_Salary"
                 label="Basic Salary"
-                rules={[
-                  {
-                    type: "number",
-                    min: 1,
-                    message: "Must be a positive number",
-                  },
-                ]}
               >
                 <InputNumber
                   className="w-full"
                   placeholder="Enter Basic Salary"
-                  min={0}
+                  min={1}
                 />
               </Form.Item>
             </Col>
@@ -135,7 +142,13 @@ const EditEmployee = ({ open, onClose, record }) => {
             <Button onClick={onClose} className="py-6 px-8">
               Cancel
             </Button>
-            <Button type="primary" className="py-6 px-8" htmlType="submit">
+            <Button
+              color="default"
+              variant="solid"
+              className="py-6 px-8"
+              htmlType="submit"
+              loading={mutation.isLoading} // Show loading state when mutating
+            >
               Update
             </Button>
           </div>

@@ -44,10 +44,11 @@ export const response = async (format) => {
   });
 };
 
-export const sendEmailToEmployee = async ({ name, email }) => {
+export const sendEmailToEmployee = async ({ name, email,tinNumber }) => {
   const response = await authAxios.post(`${API_BASE_URL}/sendEmail`, {
     name,
     email,
+    tinNumber
   });
   return response.data;
 };

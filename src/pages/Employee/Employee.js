@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Tag, Button, Modal } from "antd";
+import { Table, Tag, Button, Modal, message } from "antd";
 import {
   CheckCircleOutlined,
   DeleteOutlined,
@@ -9,9 +9,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import EditEmployee from "./EditEmployee/EditEmployee";
 import AddEmployee from "./AddEmployee/AddEmployee";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { fetchEmployees } from "../../services/employeeService";
+import { deleteEmployee, fetchEmployees } from "../../services/employeeService";
 
 const { Column } = Table;
 
@@ -29,6 +29,20 @@ function Employee() {
     queryFn: () => fetchEmployees(),
     keepPreviousData: true,
     staleTime: 5000,
+  });
+
+  // Mutation to delete the employee
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteEmployee(id), 
+    onSuccess: () => {
+      message.success("Employee deleted successfully!");
+      refetch(); 
+      setIsDeleteModalOpen(false);
+    },
+    onError: (error) => {
+      message.error(`Failed to delete employee: ${error.message}`);
+      setIsDeleteModalOpen(false);
+    },
   });
 
   const showDrawer = (record) => {
@@ -57,6 +71,13 @@ function Employee() {
     setIsDeleteModalOpen(false);
     setRecordToDelete(null);
   };
+
+   const handleDeleteOk = () => {
+    console.log("setRecordToDelete ", recordToDelete);
+     if (recordToDelete) {
+       deleteMutation.mutate(recordToDelete.tinNumber); 
+     }
+   };
 
   const dataSource = data?.employees?.map((employee) => ({
     key: employee.id,
@@ -108,7 +129,9 @@ function Employee() {
                 <Button
                   type="default"
                   onClick={() =>
-                    navigate(`/payroll/${record.tinNumber}`, { state: { record } })
+                    navigate(`/payroll/${record.tinNumber}`, {
+                      state: { record },
+                    })
                   }
                   className="w-full md:w-auto"
                 >
@@ -134,7 +157,7 @@ function Employee() {
                 <Button
                   color="danger"
                   style={{ color: "red" }}
-                  onClick={() => showDeleteModal()}
+                  onClick={() => showDeleteModal(record)}
                   className="w-full md:w-auto bg-danger-200 text-white"
                 >
                   <DeleteOutlined />
@@ -160,7 +183,7 @@ function Employee() {
       <Modal
         title="Delete"
         open={isDeleteModalOpen}
-        // onOk={handleDeleteOk}
+        onOk={handleDeleteOk}
         onCancel={handleDeleteCancel}
       >
         <p>Are you sure you want to delete the employee ?</p>

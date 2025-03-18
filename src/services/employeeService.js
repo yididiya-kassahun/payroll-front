@@ -7,7 +7,7 @@ export const queryClient = new QueryClient();
 const getToken = () => localStorage.getItem("authToken");
 
 const authAxios = axios.create({
-  baseURL: API_BASE_URL, 
+  baseURL: API_BASE_URL,
 });
 
 authAxios.interceptors.request.use(
@@ -30,6 +30,21 @@ export const fetchEmployees = async () => {
 
 export const addEmployee = async (fields) => {
   const response = await authAxios.post("/employee", fields);
+  return response;
+};
+
+export const updateEmployee = async (employeeData) => {
+  const response = await authAxios.put(
+    `${API_BASE_URL}/employee`,
+    employeeData
+  );
+  return response.data;
+};
+
+export const deleteEmployee = async (id) => {
+  const response = await authAxios.post(
+    `${API_BASE_URL}/deleteEmployee/${id}`
+  );
   return response;
 };
 

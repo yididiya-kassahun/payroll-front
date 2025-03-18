@@ -1,0 +1,49 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      context: ./payroll-back
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development  # Or "production"
+      - DB_HOST=db 
+      - DB_USER=your_db_user
+      - DB_PASSWORD=your_db_pass
+      - DB_NAME=your_db_name
+    depends_on:
+      - db  
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./payroll-front
+    ports:
+      - "3000:80" 
+    depends_on:
+      - backend  # Ensure the backend service starts first
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:5050  
+    networks:
+      - app-network
+
+  db:
+    image: postgres:14-alpine  # Or your preferred PostgreSQL version
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Userx123
+      - POSTGRES_DB=Payroll_DB
+    volumes:
+      - db_data:/var/lib/postgresql/data  # Persist database data
+    networks:
+      - app-network
+
+volumes:
+  db_data:  # Named volume for database data
+
+networks:
+  app-network:
+    driver: bridge
