@@ -60,9 +60,16 @@ export const addAllowance = async (fields) => {
 };
 
 export const editAllowance = async (fields) => {
-  const response = await authAxios.post("/allowance", fields);
+  const response = await authAxios.put("/allowance", fields);
   return response;
 };
+
+export const deleteAllowance = async (id) => {
+const response = await authAxios.post(
+    `${API_BASE_URL}/deleteAllowance/${id}`
+  );
+  return response;
+}
 
 export const addLoan = async (fields) => {
   try {
@@ -82,7 +89,7 @@ export const fetchLoanHistory = async (tin) => {
 
 export const fetchTaxes = async (tin) => {
   const tax = await authAxios.get(`/tax?tin_number=${tin}`);
-  console.log("tax ", tax.data);
+ // console.log("tax ", tax.data);
   return tax.data;
 };
 

@@ -4,15 +4,17 @@ import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import { data } from "react-router-dom";
 
-// Assuming API_BASE_URL and record are defined elsewhere in your code
-
 const pdfFormatter = async (record, format) => {
+  const token = localStorage.getItem("authToken");
   try {
     const response = await axios.get(
       `${API_BASE_URL}/reports/payroll?employee_tin=${record.tinNumber}`,
       {
         params: { format },
-        responseType: "json", // Expect JSON response
+        responseType: "json",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
 
@@ -20,6 +22,10 @@ const pdfFormatter = async (record, format) => {
     console.log(dataSource);
 
     const doc = new jsPDF();
+
+    // Extract employee details from dataSource (assuming the data is in the first element)
+    const employeeDetails =
+      dataSource && dataSource.length > 0 ? dataSource[0] : null;
 
     const tableColumn = [
       "Payroll Date",
@@ -54,16 +60,50 @@ const pdfFormatter = async (record, format) => {
       tableRows.push(rowData);
 
       if (index === 0) {
-        fileName = `payroll_report${record.tinNumber.replace(/\s+/g, "_")}`;
+        fileName = `payroll_report_${record.tinNumber.replace(/\s+/g, "_")}`;
       }
     });
 
-    doc.text("Payroll Report", 14, 15);
+    doc.text("Payroll Report", 148, 25);
+
+    let currentY = 20; 
+
+    if (employeeDetails) {
+      doc.setFontSize(10);
+      doc.text(
+        `Employee Name: ${employeeDetails.employee_name || "N/A"}`,
+        14,
+        currentY
+      );
+      currentY += 7; 
+      doc.text(
+        `Employee TIN: ${employeeDetails.employee_tin || "N/A"}`,
+        14,
+        currentY
+      );
+      currentY += 7;
+      doc.text(
+        `Basic Salary: ${employeeDetails.basic_salary || "N/A"}`,
+        14,
+        currentY
+      );
+      currentY += 7;
+      doc.text(
+        `Bank Account: ${employeeDetails.bank_account || "N/A"}`,
+        14,
+        currentY
+      );
+      currentY += 10; // Add some extra space before the table
+    } else {
+      doc.setFontSize(10);
+      doc.text("Employee details not found.", 14, currentY);
+      currentY += 10; // Adjust spacing before table
+    }
 
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 20,
+      startY: currentY, // startY dynamically adjust based on employee info height
       styles: { fontSize: 8 }, // Adjusted font size for more columns
       columnStyles: {
         // Optional: Adjust column widths as needed

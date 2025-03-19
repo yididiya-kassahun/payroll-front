@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { Form, InputNumber, message, Drawer, Button } from "antd";
 import { editAllowance } from "../../services/employeeService";
+import { useMutation } from "@tanstack/react-query";
 
 const EditAllowance = ({ open, onClose, allowanceData, refetch }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
-  // console.log("allowanceData ", allowanceData);
+  console.log("allowanceData ", allowanceData);
+
+  const mutation = useMutation({
+    mutationFn: editAllowance,
+    onSuccess: () => {
+      message.success("Allowance record updated successfully!");
+      refetch();
+      onClose();
+    },
+    onError: (error) => {
+      message.error(`Failed to update Allowance: ${error.message}`);
+    },
+  });
 
   useEffect(() => {
     if (allowanceData) {
@@ -24,18 +37,10 @@ const EditAllowance = ({ open, onClose, allowanceData, refetch }) => {
 
   const onFinish = async (values) => {
     setLoading(true);
-    try {
-      await editAllowance(allowanceData.id, values);
-      message.success("Allowance updated successfully!");
-      refetch(); // Refresh the allowance data
-      onClose();
-      form.resetFields();
-    } catch (error) {
-      console.error("Error updating allowance:", error);
-      message.error("Failed to update allowance.");
-    } finally {
-      setLoading(false);
-    }
+    mutation.mutate({
+      employee_tin: allowanceData?.tinNumber, 
+      ...values,
+    });
   };
 
   const onFinishFailed = (errorInfo) => {

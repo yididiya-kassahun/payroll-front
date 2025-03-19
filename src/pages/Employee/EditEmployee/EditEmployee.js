@@ -15,12 +15,11 @@ import { updateEmployee } from "../../../services/employeeService";
 const EditEmployee = ({ open, onClose, record }) => {
   const [form] = Form.useForm();
 
-  // Mutation to update the employee
   const mutation = useMutation({
     mutationFn: updateEmployee,
     onSuccess: () => {
       message.success("Employee record updated successfully!");
-      onClose(); // Close the drawer on success
+      onClose(); 
     },
     onError: (error) => {
       message.error(`Failed to update employee: ${error.message}`);

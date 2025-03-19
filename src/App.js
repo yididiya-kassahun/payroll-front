@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./services/http";
 
@@ -20,20 +20,29 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import { ReportProvider } from "./context/ReportContext";
 
 function App() {
+  const isAuthenticated = !!localStorage.getItem("authToken");
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <ReportProvider>
           <Routes>
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Dashboard />}>
-                <Route path="home" element={<Home />} />
-                <Route path="employee" element={<Employee />} />
-                <Route path="payroll/:id" element={<Payroll />} />
-                <Route path="account" element={<Account />} />
-                <Route path="allowance" element={<Allowance />} />
-                <Route path="setting" element={<Setting />} />
-              </Route>
+            <Route
+              path="/"
+              element={
+                isAuthenticated ? (
+                  <Dashboard />
+                ) : (
+                  <Navigate to="/signin" replace />
+                )
+              }
+            >
+              <Route path="home" element={<Home />} />
+              <Route path="employee" element={<Employee />} />
+              <Route path="payroll/:id" element={<Payroll />} />
+              <Route path="account" element={<Account />} />
+              <Route path="allowance" element={<Allowance />} />
+              <Route path="setting" element={<Setting />} />
             </Route>
 
             <Route path="signin" element={<Signin />} />

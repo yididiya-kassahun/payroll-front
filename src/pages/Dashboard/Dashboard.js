@@ -8,18 +8,21 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   SettingOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
-import { Outlet, useNavigate } from "react-router-dom";
-import Logo from "../../assets/logo/logo.jpg"
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
 
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+
+  const isAuthenticated = !!localStorage.getItem("authToken");
+
+  if (!isAuthenticated) {
+    return <Navigate to="/signin" replace />;
+  }
 
   const {
     token: { colorBgContainer, borderRadiusLG },

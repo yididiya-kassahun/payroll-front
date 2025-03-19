@@ -436,7 +436,7 @@ function Payroll({ format }) {
 
         <Col span={12}>
           <div className="bg-white shadow-md p-6 mt-10 rounded-lg">
-            <h2 className="text-xl font-bold mb-4">Loan Payment History</h2>
+            <h2 className="text-xl font-bold mb-4">Loan Monthly Deduction</h2>
             <Table dataSource={loanHistory} pagination={{ pageSize: 5 }}>
               <Column
                 title="Loan Amount"

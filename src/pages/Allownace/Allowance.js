@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal } from "antd";
+import { Table, Button, Modal, message } from "antd";
 import { CheckCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 import EditAllowance from "./EditAllowance";
 import AddAllowance from "./AddAllowance";
-import { fetchAllowance } from "../../services/employeeService";
-import { useQuery } from "@tanstack/react-query";
+import { deleteAllowance, fetchAllowance } from "../../services/employeeService";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { API_BASE_URL } from "../../config";
 
 const { Column } = Table;
@@ -33,7 +33,7 @@ function Allowance() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, 
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -55,6 +55,20 @@ function Allowance() {
 
     fetchEmployees();
   }, []);
+
+  // Mutation to delete the employee
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteAllowance(id),
+    onSuccess: () => {
+      message.success("Allowance deleted successfully!");
+      refetch();
+      setIsDeleteModalOpen(false);
+    },
+    onError: (error) => {
+      message.error(`Failed to delete Allowance: ${error.message}`);
+      setIsDeleteModalOpen(false);
+    },
+  });
 
   const showAddModal = () => {
     setIsModalOpen(true);
@@ -80,7 +94,7 @@ function Allowance() {
   };
 
   const handleDeleteOk = async () => {
-    console.log("Deleting allowance with ID:", recordToDelete.id); 
+    console.log("Deleting allowance with ID:", recordToDelete.id);
     setIsDeleteModalOpen(false);
     setRecordToDelete(null);
     refetch();
@@ -178,7 +192,7 @@ function Allowance() {
                 <Button
                   color="danger"
                   style={{ color: "red" }}
-                  onClick={() => showDeleteModal()}
+                  onClick={() => showDeleteModal(record)}
                   className="w-full md:w-auto bg-danger-200 text-white"
                 >
                   <DeleteOutlined />
@@ -198,7 +212,7 @@ function Allowance() {
         isModalOpen={isModalOpen}
         handleOk={handleAddOk}
         handleCancel={handleAddCancel}
-        tinNumbers={employeeTinNumbers} 
+        tinNumbers={employeeTinNumbers}
       />
       <Modal
         title="Delete"
