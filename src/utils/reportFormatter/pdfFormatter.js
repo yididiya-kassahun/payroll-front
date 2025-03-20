@@ -23,7 +23,6 @@ const pdfFormatter = async (record, format) => {
 
     const doc = new jsPDF();
 
-    // Extract employee details from dataSource (assuming the data is in the first element)
     const employeeDetails =
       dataSource && dataSource.length > 0 ? dataSource[0] : null;
 
@@ -42,7 +41,7 @@ const pdfFormatter = async (record, format) => {
 
     const tableRows = [];
 
-    let fileName = "Processed_Payment_Report"; // Default file name
+    let fileName = "Processed_Payment_Report"; 
 
     dataSource?.forEach((payrollData, index) => {
       const rowData = [
@@ -103,10 +102,9 @@ const pdfFormatter = async (record, format) => {
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: currentY, // startY dynamically adjust based on employee info height
-      styles: { fontSize: 8 }, // Adjusted font size for more columns
+      startY: currentY, 
+      styles: { fontSize: 8 }, 
       columnStyles: {
-        // Optional: Adjust column widths as needed
         0: { cellWidth: 20 }, // Payroll Date
         1: { cellWidth: 18 }, // Gross Earning
         2: { cellWidth: 18 }, // Taxable Income
@@ -123,7 +121,6 @@ const pdfFormatter = async (record, format) => {
     doc.save(`${fileName}.pdf`);
   } catch (error) {
     console.error("Error downloading PDF:", error);
-    // Handle the error appropriately, e.g., display an error message to the user
   }
 };
 

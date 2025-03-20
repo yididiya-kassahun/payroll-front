@@ -6,7 +6,7 @@ function ReportCards({ reportData }) {
       {reportData.map((item, index) => (
         <div
           key={index}
-          className={`bg-white p-4 rounded-xl shadow-lg flex flex-col h-32`} // Reduced padding & set height
+          className={`bg-white p-4 rounded-xl shadow-lg flex flex-col h-32`} 
           style={{
             backgroundImage: `url(${item.bgImage})`,
             backgroundRepeat: "no-repeat",

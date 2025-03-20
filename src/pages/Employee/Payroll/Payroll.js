@@ -36,6 +36,7 @@ import moment from "moment/moment";
 import { fetchPayroll, refreshPayroll, sendEmailToEmployee } from "../../../services/payrollService";
 import user from "../../../assets/imgs/user.png";
 import pdfFormatter from "../../../utils/reportFormatter/pdfFormatter";
+import excelFormatter from "../../../utils/reportFormatter/excelFormatter";
 import ReportCards from "./ReportCards";
 
 const { Column } = Table;
@@ -197,7 +198,10 @@ function Payroll({ format }) {
     pdfFormatter(record, format);
   };
 
- 
+  const handleExcelDownload = () => {
+     excelFormatter(record, data?.payrolls); 
+  };
+
   const { mutate:emailMutate } = useMutation({
     mutationFn: sendEmailToEmployee,
     onSuccess: () => {
@@ -228,12 +232,8 @@ function Payroll({ format }) {
             <div className="flex items-center gap-4">
               <Avatar size={64} src={user} />
               <div>
-                <h2 className="font-semibold text-lg">
-                  {record?.name}
-                </h2>
-                <p className="text-gray-500 text-sm">
-                  Email: {record?.email}
-                </p>
+                <h2 className="font-semibold text-lg">{record?.name}</h2>
+                <p className="text-gray-500 text-sm">Email: {record?.email}</p>
                 <p className="text-gray-500 text-sm">
                   Tin Number : {record?.tinNumber}
                 </p>
@@ -250,14 +250,13 @@ function Payroll({ format }) {
 
       <div className="bg-white shadow-md mt-10 p-4">
         <Row gutter={[16, 16]} align="middle">
-          {/* File Export Buttons (Left Side) */}
           <Col>
             <Button
               {...buttonStyle}
               icon={<FileExcelOutlined />}
               style={{ backgroundColor: "#28a745", borderColor: "#28a745" }}
               key="excel"
-              onClick={handleDownload}
+              onClick={handleExcelDownload}
             >
               Excel
             </Button>

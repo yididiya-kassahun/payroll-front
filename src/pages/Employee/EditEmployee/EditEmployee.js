@@ -41,7 +41,7 @@ const EditEmployee = ({ open, onClose, record }) => {
   }, [form, record]);
 
   const onFinish = (values) => {
-    mutation.mutate(values); // Trigger mutation on form submit
+    mutation.mutate(values); 
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -146,7 +146,7 @@ const EditEmployee = ({ open, onClose, record }) => {
               variant="solid"
               className="py-6 px-8"
               htmlType="submit"
-              loading={mutation.isLoading} // Show loading state when mutating
+              loading={mutation.isLoading} 
             >
               Update
             </Button>

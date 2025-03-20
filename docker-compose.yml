@@ -8,9 +8,9 @@ services:
     environment:
       - NODE_ENV=development  # Or "production"
       - DB_HOST=db 
-      - DB_USER=your_db_user
-      - DB_PASSWORD=your_db_pass
-      - DB_NAME=your_db_name
+      - DB_USER=postgres
+      - DB_PASSWORD=Userx123
+      - DB_NAME=Payroll_DB
     depends_on:
       - db  
     networks:
@@ -24,7 +24,7 @@ services:
     depends_on:
       - backend  # Ensure the backend service starts first
     environment:
-      - REACT_APP_API_BASE_URL=http://localhost:5050  
+      - REACT_APP_API_BASE_URL=http://localhost:3000 
     networks:
       - app-network
 
