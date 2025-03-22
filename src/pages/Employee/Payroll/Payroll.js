@@ -49,6 +49,8 @@ function Payroll({ format }) {
 
   const { record } = location.state || {};
 
+  console.log("Record from location:", record);
+
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["payroll", record?.tinNumber],
     queryFn: () => fetchPayroll(record?.tinNumber),
@@ -80,7 +82,7 @@ function Payroll({ format }) {
 
   const { data: taxData, refetch: refetchTax } = useQuery({
     queryKey: ["tax", record?.tinNumber],
-    queryFn: () => fetchTaxes("1234"),
+    queryFn: () => fetchTaxes(record.tinNumber),
     keepPreviousData: true,
     staleTime: 5000,
     enabled: !!record?.tinNumber,
@@ -110,28 +112,28 @@ function Payroll({ format }) {
     return [
       {
         label: "Taxable Income",
-        value: tax.taxable_income,
+        value: Number(tax.taxable_income).toFixed(2),
         icon: <UsergroupAddOutlined className="text-3xl text-blue-500" />,
         bgColor: "bg-blue-100",
         textColor: "text-blue-600",
       },
       {
         label: "Income Tax",
-        value: tax.income_tax,
+        value: Number(tax.income_tax).toFixed(2),
         icon: <BookOutlined className="text-3xl text-yellow-500" />,
         bgColor: "bg-yellow-100",
         textColor: "text-yellow-600",
       },
       {
         label: "Employer Pension Contribution",
-        value: tax.employer_pension_contribution,
+        value: Number(tax.employer_pension_contribution).toFixed(2),
         icon: <SwapRightOutlined className="text-3xl text-green-500" />,
         bgColor: "bg-green-100",
         textColor: "text-green-600",
       },
       {
         label: "Employee Pension Contribution",
-        value: tax.employee_pension_contribution,
+        value: Number(tax.employee_pension_contribution).toFixed(2),
         icon: <MessageOutlined className="text-3xl text-purple-500" />,
         bgColor: "bg-purple-100",
         textColor: "text-purple-600",
@@ -232,8 +234,12 @@ function Payroll({ format }) {
             <div className="flex items-center gap-4">
               <Avatar size={64} src={user} />
               <div>
-                <h2 className="font-semibold text-lg">{record?.name}</h2>
-                <p className="text-gray-500 text-sm">Email: {record?.email}</p>
+                <h2 className="font-semibold text-lg">
+                  {record?.Employee_Name}
+                </h2>
+                <p className="text-gray-500 text-sm">
+                  Email: {record?.Employee_Email}
+                </p>
                 <p className="text-gray-500 text-sm">
                   Tin Number : {record?.tinNumber}
                 </p>

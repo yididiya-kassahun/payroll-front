@@ -82,8 +82,8 @@ function Employee() {
   const dataSource = data?.employees?.map((employee) => ({
     key: employee.id,
     tinNumber: employee.Employee_TIN,
-    email: employee.Employee_Email,
-    name: employee.Employee_Name,
+    Employee_Name: employee.Employee_Name,
+    Employee_Email: employee.Employee_Email,
     salary: employee.Basic_Salary,
     bankAccount: employee.Bank_Account,
     Penality: employee.Penalty,
@@ -108,10 +108,23 @@ function Employee() {
         <Table dataSource={dataSource}>
           <Column
             title="Employee Name"
-            dataIndex="name"
-            key="name"
-            render={(name) => <a>{name}</a>}
+            dataIndex="Employee_Name"
+            key="Employee_Name"
+            render={(text, record) => {
+              return (
+                <>
+                  <a>{record.Employee_Name}</a>
+                  {record.Employee_Email && (
+                    <>
+                      <br />
+                      <small>{record.Employee_Email}</small>
+                    </>
+                  )}
+                </>
+              );
+            }}
           />
+
           <Column title="Tin Number" dataIndex="tinNumber" key="tinNumber" />
 
           <Column title="Salary" dataIndex="salary" key="salary" />

@@ -31,7 +31,8 @@ const EditEmployee = ({ open, onClose, record }) => {
     if (record) {
       form.setFieldsValue({
         Employee_TIN: record.tinNumber,
-        Employee_Name: record.name,
+        Employee_Name: record.Employee_Name,
+        Employee_Email: record.Employee_Email,
         Basic_Salary: record.salary,
         Penality: record.Penality,
         Food_Deduction: record.Food_Deduction,
@@ -80,6 +81,10 @@ const EditEmployee = ({ open, onClose, record }) => {
               </Form.Item>
             </Col>
           </Row>
+
+          <Form.Item name="Employee_Email" label="Email">
+            <Input placeholder="Enter Email Address" />
+          </Form.Item>
 
           <Row gutter={16}>
             <Col span={12}>
