@@ -14,6 +14,7 @@ import { updateEmployee } from "../../../services/employeeService";
 
 const EditEmployee = ({ open, onClose, record }) => {
   const [form] = Form.useForm();
+  console.log("record", record);
 
   const mutation = useMutation({
     mutationFn: updateEmployee,
@@ -32,8 +33,8 @@ const EditEmployee = ({ open, onClose, record }) => {
         Employee_TIN: record.tinNumber,
         Employee_Name: record.name,
         Basic_Salary: record.salary,
+        Penality: record.Penality,
         Food_Deduction: record.Food_Deduction,
-        Penalty: record.Penalty,
         Number_of_Working_Days: record.Number_of_Working_Days,
         Bank_Account: record.bankAccount,
       });
@@ -82,10 +83,7 @@ const EditEmployee = ({ open, onClose, record }) => {
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                name="Basic_Salary"
-                label="Basic Salary"
-              >
+              <Form.Item name="Basic_Salary" label="Basic Salary">
                 <InputNumber
                   className="w-full"
                   placeholder="Enter Basic Salary"
@@ -94,14 +92,9 @@ const EditEmployee = ({ open, onClose, record }) => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="Food_Deduction"
-                label="Food Deduction"
-                initialValue={0}
-              >
+              <Form.Item name="Food_Deduction" label="Food Deduction">
                 <InputNumber
                   className="w-full"
-                  min={0}
                   placeholder="Enter Food Deduction"
                 />
               </Form.Item>
@@ -110,11 +103,10 @@ const EditEmployee = ({ open, onClose, record }) => {
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="Penalty" label="Penalty" initialValue={0}>
+              <Form.Item name="Penality" label="Penality">
                 <InputNumber
                   className="w-full"
-                  min={0}
-                  placeholder="Enter Penalty Amount"
+                  placeholder="Enter Penality Amount"
                 />
               </Form.Item>
             </Col>
@@ -146,7 +138,7 @@ const EditEmployee = ({ open, onClose, record }) => {
               variant="solid"
               className="py-6 px-8"
               htmlType="submit"
-              loading={mutation.isLoading} 
+              loading={mutation.isLoading}
             >
               Update
             </Button>

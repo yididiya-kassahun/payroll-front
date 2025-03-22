@@ -87,6 +87,7 @@ function Employee() {
     salary: employee.Basic_Salary,
     bankAccount: employee.Bank_Account,
     Penality: employee.Penalty,
+    Food_Deduction: employee.Food_Deduction,
     Number_of_Working_Days: employee.Number_of_Working_Days,
   }));
 
@@ -116,6 +117,11 @@ function Employee() {
           <Column title="Salary" dataIndex="salary" key="salary" />
           <Column title="Bank Acc." dataIndex="bankAccount" key="bankAccount" />
           <Column title="Penality" dataIndex="Penality" key="Penality" />
+          <Column
+            title="Food Deduction"
+            dataIndex="Food_Deduction"
+            key="Food_Deduction"
+          />
           <Column
             title="Number of Working Days"
             dataIndex="Number_of_Working_Days"
